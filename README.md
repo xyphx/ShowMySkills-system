@@ -2,6 +2,10 @@
 
 An open-source full-stack monorepo built with **Next.js** (Frontend), **Express Node.js** (Backend), **Swagger / OpenAPI**, **Docker & Docker Compose**, and automated **AWS EC2 Production CI/CD**.
 
+🌐 **Production Website**: [https://showmyskills.xyphx.com](https://showmyskills.xyphx.com)  
+🔌 **Production API Base**: [https://showmyskills.xyphx.com/api](https://showmyskills.xyphx.com/api)  
+📘 **Swagger API Specs**: [https://showmyskills.xyphx.com/api/docs](https://showmyskills.xyphx.com/api/docs)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](https://www.docker.com/)
 [![AWS EC2 Production CI/CD](https://img.shields.io/badge/Deploy-Production%20EC2-orange.svg)](https://github.com/features/actions)
@@ -17,15 +21,15 @@ An open-source full-stack monorepo built with **Next.js** (Frontend), **Express 
 
 ## 🐋 Quickstart with Docker Compose
 
-Run the entire full-stack system locally with containerized MongoDB, Express API, and Next.js frontend:
+Run the entire full-stack system locally with containerized Nginx reverse proxy, Express API, Next.js frontend, and MongoDB:
 
 ```bash
 docker compose up -d --build
 ```
 
-- **Frontend App**: `http://localhost:3000`
-- **Express API**: `http://localhost:5000/api`
-- **Swagger Documentation**: `http://localhost:5000/api/docs`
+- **Frontend Website**: `https://showmyskills.xyphx.com` (or `http://localhost:3000`)
+- **Express API**: `https://showmyskills.xyphx.com/api` (or `http://localhost:5000/api`)
+- **Swagger Documentation**: `https://showmyskills.xyphx.com/api/docs` (or `http://localhost:5000/api/docs`)
 
 ---
 

@@ -1,11 +1,13 @@
 # Express REST API Documentation
 
-Base Endpoint: `http://localhost:5000/api`
+Production Base Endpoint: `https://showmyskills.xyphx.com/api`
+Local Development Endpoint: `http://localhost:5000/api`
 
 ## Interactive Swagger UI Documentation
 Explore and test all API endpoints live via Swagger UI at:
 ```
-http://localhost:5000/api/docs
+Production: https://showmyskills.xyphx.com/api/docs
+Local:      http://localhost:5000/api/docs
 ```
 
 ## Available API Routes Prefix (`/api/*`)
