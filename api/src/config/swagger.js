@@ -10,8 +10,12 @@ const options = {
     },
     servers: [
       {
-        url: process.env.API_BASE_URL || 'http://localhost:5000/api',
-        description: 'Express API Base Endpoint'
+        url: process.env.API_BASE_URL || 'https://showmyskills.xyphx.com/api',
+        description: 'Production API Endpoint'
+      },
+      {
+        url: 'http://localhost:5000/api',
+        description: 'Local Development API Endpoint'
       }
     ],
     components: {
