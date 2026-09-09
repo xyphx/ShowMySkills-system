@@ -1,0 +1,8 @@
+{
+  "name": "ShowMySkills System",
+  "type": "opensource-monorepo",
+  "frontend": "web",
+  "backend": "api",
+  "documentation": "docs",
+  "swagger": "/api-docs"
+}

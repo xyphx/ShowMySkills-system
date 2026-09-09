@@ -1,198 +1,49 @@
-# ShowMySkills 🌟
+# ShowMySkills System 🚀
 
-**Showcase Your Talents, Build Your Network, Grow Your Career**
+An open-source full-stack monorepo built with **Next.js** (Frontend), **Express Node.js** (Backend), **Swagger / OpenAPI**, **Docker & Docker Compose**, and automated **AWS EC2 Production CI/CD**.
 
-ShowMySkills is a modern web platform built with Next.js that empowers students, professionals, and creators to showcase their skills, experience, and achievements while building meaningful connections within a vibrant community.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](https://www.docker.com/)
+[![AWS EC2 Production CI/CD](https://img.shields.io/badge/Deploy-Production%20EC2-orange.svg)](https://github.com/features/actions)
 
-## 🚀 Features
+---
 
-### For Users
-- **📱 Responsive Design** - Seamless experience across all devices
-- **🎨 Profile Creation** - Build comprehensive digital portfolios
-- **⭐ Community Recognition** - Star system for peer recognition
-- **📄 Resume Management** - Upload and share professional documents
-- **🔗 Social Integration** - Connect LinkedIn, GitHub, and Instagram
-- **🔍 Discovery** - Find profiles by skills, location, or institution
-- **📊 Skills Categorization** - Organize skills by technology domains
-- **🎯 Achievement Tracking** - Showcase certifications and accomplishments
+## 🌿 Git Branching & Production Deployment
 
-### For Developers
-- **⚡ Next.js 15** - Latest React framework with App Router
-- **🔥 Firebase Integration** - Real-time database and authentication
-- **🎨 Tailwind CSS v4** - Modern utility-first styling
-- **📸 ImageKit** - Optimized image management
-- **🛡️ Type Safety** - JavaScript with JSConfig
-- **📱 Mobile-First** - Responsive design patterns
+- **`dev`**: Active feature development.
+- **`production`**: Production branch. Pushes to `production` trigger automated deployment to AWS EC2.
 
-## 🛠️ Tech Stack
+---
 
-- **Frontend**: Next.js 15, React 19
-- **Styling**: Tailwind CSS v4, Lucide React Icons
-- **Backend**: Firebase (Firestore, Authentication, Storage)
-- **Image Management**: ImageKit
-- **Image Editing**: React Easy Crop
-- **Deployment**: Netlify
-- **Package Manager**: npm
+## 🐋 Quickstart with Docker Compose
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 22.16.0 or higher
-- npm 10.8.1 or higher
-- Firebase account
-- ImageKit account
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/ar610/XyphX-ShowMySkills-Website.git
-   cd XyphX-ShowMySkills-Website
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-   
-   Create a `.env.local` file in the root directory:
-   ```env
-   # Firebase Configuration
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
-
-   # ImageKit Configuration
-   NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
-   NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_endpoint
-   IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
-   ```
-
-4. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**
-   
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 📁 Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── [username]/        # Dynamic profile pages
-│   ├── about/             # About page
-│   ├── api/               # API routes
-│   ├── auth/              # Authentication page
-│   ├── home/              # Dashboard/home page
-│   ├── learnmore/         # Learn more page
-│   └── profile-setup/     # Profile creation page
-├── components/            # Reusable React components
-│   ├── AuthForm.jsx       # Authentication form
-│   ├── DashboardCard.jsx  # Profile cards
-│   ├── Footer.jsx         # Site footer
-│   ├── Homepage.jsx       # Landing page
-│   ├── ImageCropper.jsx   # Image editing component
-│   ├── Nav.jsx            # Navigation bar
-│   ├── ProfileEdit.jsx    # Profile editing
-│   ├── ProfileSetup.jsx   # Initial profile setup
-│   └── ProtectedRoute.jsx # Route protection
-├── config/                # Configuration files
-│   ├── firebase.js        # Firebase setup
-│   └── imagekit.js        # ImageKit setup
-├── contexts/              # React contexts
-│   └── AuthContext.js     # Authentication context
-├── hooks/                 # Custom React hooks
-│   ├── useFileUpload.js   # File upload logic
-│   ├── useImageUpload.js  # Image upload logic
-│   └── useProfileCheck.js # Profile validation
-└── utils/                 # Utility functions
-    ├── profileUtils.js    # Profile helpers
-    └── skills.js          # Skills categorization
-```
-
-## 🎯 Key Features Explained
-
-### Profile System
-- **Dynamic URLs**: Each user gets a unique URL (`/username`)
-- **Complete Profiles**: Skills, experience, achievements, contact info
-- **Resume Upload**: PDF support with download functionality
-- **Image Management**: Profile pictures with cropping capabilities
-
-### Community Features
-- **Star System**: Users can star profiles they admire
-- **Discovery**: Browse profiles by skills, college, or location
-- **Responsive Cards**: Mobile-optimized profile cards
-
-### Authentication & Security
-- **Firebase Auth**: Secure user authentication
-- **Protected Routes**: Authenticated-only areas
-- **Profile Ownership**: Users can only edit their own profiles
-
-## 🌐 Deployment
-
-### Netlify Deployment
-
-The project is configured for easy Netlify deployment:
-
-1. **Connect your repository** to Netlify
-2. **Set environment variables** in Netlify dashboard
-3. **Deploy settings**:
-   - Build command: `npm run build`
-   - Publish directory: `.next`
-   - Node version: `22.16.0`
-
-### Build Configuration
-
-The project includes:
-- `netlify.toml` - Netlify configuration
-- `.nvmrc` - Node.js version specification
-- `tailwind.config.js` - Tailwind CSS configuration
-
-## 🔧 Development Scripts
+Run the entire full-stack system locally with containerized MongoDB, Express API, and Next.js frontend:
 
 ```bash
-# Development server with Turbopack
-npm run dev
-
-# Production build
-npm run build
-
-# Start production server
-npm start
-
-# Lint code
-npm run lint
+docker compose up -d --build
 ```
 
+- **Frontend App**: `http://localhost:3000`
+- **Express API**: `http://localhost:5000/api`
+- **Swagger Documentation**: `http://localhost:5000/api/docs`
 
+---
 
+## 🚀 AWS EC2 Production Deployment
 
-## 🏢 About XyphX
+Pushing code to the **`production`** branch automatically triggers the deployment pipeline ([.github/workflows/deploy-ec2.yml](file:///.github/workflows/deploy-ec2.yml)).
 
-ShowMySkills is proudly developed by **XyphX**, a budding service-based tech company with the ambitious vision of transforming into a revolutionary tech product powerhouse. We specialize in creating smart, futuristic, and industry-redefining solutions.
+### Required GitHub Secrets:
+1. `EC2_HOST`: Public IP address or domain of EC2 instance.
+2. `EC2_USER`: SSH User (e.g., `ubuntu` or `ec2-user`).
+3. `EC2_SSH_KEY`: Private SSH Key content (.pem).
 
-- 🌐 **Website**: [xyphx.com](https://www.xyphx.com/)
-- 📧 **Contact**: xyphx.company@gmail.com
-- 💼 **LinkedIn**: [XyphX Company](https://www.linkedin.com/company/xyphx/)
-- 💻 **GitHub**: [XyphX](https://github.com/xyphx)
+---
 
-## 🆘 Support
+## 🤝 Contributing
 
-If you encounter any issues or have questions:
+Read our [CONTRIBUTING.md](file:///C:/Users/sidha/OneDrive/Desktop/CodeDOT/ShowMySkills-system/CONTRIBUTING.md) and adhere to our [CODE_OF_CONDUCT.md](file:///C:/Users/sidha/OneDrive/Desktop/CodeDOT/ShowMySkills-system/CODE_OF_CONDUCT.md).
 
-1. Check the [Issues](https://github.com/ar610/XyphX-ShowMySkills-Website/issues) page
-2. Create a new issue with detailed information
-3. Contact us at xyphx.company@gmail.com
+## 📜 License
 
-
-
-
+Available under the [MIT License](file:///C:/Users/sidha/OneDrive/Desktop/CodeDOT/ShowMySkills-system/LICENSE).

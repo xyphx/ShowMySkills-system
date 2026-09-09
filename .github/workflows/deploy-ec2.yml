@@ -1,0 +1,47 @@
+name: Deploy Production to AWS EC2
+
+on:
+  push:
+    branches: [ production]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Production Application to AWS EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script: |
+            echo "🚀 Starting Production Deployment on EC2..."
+            
+            # Ensure target deployment folder exists
+            mkdir -p ~/app
+            cd ~/app
+            
+            # Sync or Pull latest code from production branch
+            if [ -d ".git" ]; then
+              git fetch --all
+              git reset --hard origin/${{ github.ref_name }}
+            else
+              git clone -b ${{ github.ref_name }} ${{ github.server_url }}/${{ github.repository }}.git .
+            fi
+            
+            # Build & Launch Docker containers
+            docker compose down --remove-orphans || true
+            docker compose up -d --build
+            
+            # Check Container Status
+            docker compose ps
+            echo "✅ Production EC2 Deployment Completed Successfully!"
