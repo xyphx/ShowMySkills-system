@@ -7,15 +7,29 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
   const baseUrl = getBaseUrl();
   const formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   
-  const options = {
-    method,
-    headers: { "Content-Type": "application/json" }
-  };
-  if (body) options.body = JSON.stringify(body);
+ const options = {
+  method,
+  headers: {}
+};
+
+if (body instanceof FormData) {
+  options.body = body;
+} else {
+  options.headers["Content-Type"] = "application/json";
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+}
 
   const res = await fetch(`${baseUrl}${formattedEndpoint}`, options);
-  if (!res.ok) {
-    throw new Error(`HTTP error! status: ${res.status}`);
-  }
-  return res.json();
+ if (!res.ok) {
+  const errorData = await res.json();
+
+  throw new Error(
+    errorData.message || `HTTP error! status: ${res.status}`
+  );
+}
+
+return res.json();
 }

@@ -1,7 +1,28 @@
 import { Router } from 'express';
 import { authController } from '../controllers/authController.js';
-import { validateAuth } from '../validators/authValidator.js';
+//import { validateAuth } from '../validators/authValidator.js';
+import {
+  validateLogin, validateRegister} from '../validators/authValidator.js';
+  import multer from 'multer';
+ const upload = multer({
+  dest: 'uploads/college-ids/',
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'application/pdf'
+    ];
 
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPG, PNG, and PDF files are allowed'));
+    }
+  }
+});
 const router = Router();
 
 /**
@@ -31,7 +52,7 @@ const router = Router();
  *       400:
  *         description: Missing credentials
  */
-router.post('/login', validateAuth, authController.login);
+router.post('/login', validateLogin, authController.login);
 
 /**
  * @openapi
@@ -63,6 +84,11 @@ router.post('/login', validateAuth, authController.login);
  *       400:
  *         description: Invalid input
  */
-router.post('/register', validateAuth, authController.register);
-
+router.post(
+  '/register',
+  upload.single('collegeIdFile'),
+  validateRegister,
+  authController.register
+);
+router.post('/verify-email', authController.verifyEmail);
 export default router;

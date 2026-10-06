@@ -13,8 +13,27 @@ export const authController = {
 
   register: async (req, res, next) => {
     try {
-      const newUser = await userService.createUser(req.body);
+      const newUser = await userService.createUser({
+        ...req.body,
+        collegeIdDocument: req.file ? req.file.path : null
+      });
       res.status(201).json({ success: true, data: newUser });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  verifyEmail: async (req, res, next) => {
+    try {
+      const { email, otp } = req.body;
+
+      const user = await userService.verifyEmailOtp(email, otp);
+
+      res.json({
+        success: true,
+        message: 'Email verified successfully',
+        data: user
+      });
     } catch (error) {
       next(error);
     }

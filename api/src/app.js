@@ -36,9 +36,16 @@ apiRouter.all('*', (req, res) => {
 app.use('/api', apiRouter);
 
 // Global Error Handler
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ success: false, message: err.message || 'Internal Server Error' });
+
+  const statusCode = err.statusCode || 500;
+
+  res.status(statusCode).json({
+    success: false,
+    message: err.message || 'Internal Server Error'
+  });
 });
 
 export default app;
