@@ -1,24 +1,22 @@
-"use client";
-
 import Link from "next/link";
 import { Star, Zap, FileText, MessageCircle } from "lucide-react";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/40 to-sky-50/30 flex flex-col justify-between items-center p-3 sm:p-5 md:p-6 overflow-hidden">
+    <main className="h-screen min-h-screen bg-linear-to-br from-gray-50 via-blue-50/40 to-sky-50/30 flex flex-col items-center px-3 sm:px-5 md:px-[2.5vw] pb-4 sm:pb-8 md:pb-[7.5vh] overflow-hidden">
       {/* Top Navigation */}
-      <nav className="flex w-full max-w-7xl items-center justify-between px-2 sm:px-4 py-2 relative z-20">
+      <nav className="flex w-full h-18 flex-none items-center justify-between px-2 sm:px-4 relative z-20">
         <Link href="/" className="flex items-center gap-2 group">
           <img
             src="/Logo.jpg"
             alt="ShowMySkills Logo"
-            className="h-12 sm:h-14 md:h-16 w-auto object-contain rounded-xl border border-teal-200/60 shadow-sm transition-transform group-hover:scale-105"
+            className="h-15 w-15 object-contain rounded-md border border-teal-200/60 shadow-sm transition-transform group-hover:scale-105"
           />
         </Link>
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className="cursor-pointer bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white px-6 sm:px-7 py-2 sm:py-2.5 rounded-full font-medium text-sm sm:text-base transition-all shadow-md shadow-teal-500/20 hover:scale-105"
+            className="cursor-pointer bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white px-6 py-2 rounded-full font-medium text-base transition-all shadow-md shadow-teal-500/20 hover:scale-105"
           >
             Signup
           </Link>
@@ -26,21 +24,21 @@ export default function LandingPage() {
       </nav>
 
       {/* Main Hero Card Container */}
-      <div className="relative w-full max-w-7xl flex-1 my-2 sm:my-3 bg-[#FFF8F0] border border-[#f5ede1] shadow-xl shadow-black/5 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] overflow-hidden flex flex-col justify-center items-center py-12 md:py-20 px-4 sm:px-8">
+      <div className="relative w-full min-h-0 flex-1 bg-[#FFF8F0] border border-[#f5ede1] shadow-xl shadow-black/5 rounded-xl overflow-hidden flex flex-col justify-center items-center px-4 sm:px-8">
         
         {/* Playful Floating Doodles & Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
           {/* Top-Right Glowing Stars */}
           <div className="absolute top-8 sm:top-12 md:top-16 right-20 sm:right-32 md:right-44 text-teal-400 opacity-70">
-            <Star className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
+            <Star className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div className="absolute hidden md:block top-36 right-16 sm:right-28 text-teal-400 opacity-60">
-            <Star className="w-4 h-4 animate-pulse delay-700" />
+            <Star className="w-4 h-4" />
           </div>
 
           {/* Top-Left Playful Lightning */}
           <div className="absolute top-6 sm:top-10 md:top-14 left-6 sm:left-14 md:left-24 text-amber-300 opacity-80 rotate-12">
-            <Zap className="w-10 h-10 sm:w-12 sm:h-12 animate-bounce" />
+            <Zap className="w-10 h-10 sm:w-12 sm:h-12" />
           </div>
 
           {/* Top-Right Horizontal Doodled Bars */}
@@ -53,7 +51,7 @@ export default function LandingPage() {
 
           {/* Middle-Left Chat Bubble & Activity Doodle */}
           <div className="absolute top-1/2 -translate-y-16 left-6 sm:left-10 md:left-16 flex items-center space-x-3 opacity-70">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-300 rounded-full animate-pulse" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-300 rounded-full" />
             <div className="space-y-1">
               <div className="w-10 sm:w-12 h-2 bg-blue-200 rounded-full" />
               <div className="w-6 sm:w-8 h-2 bg-blue-200 rounded-full" />
