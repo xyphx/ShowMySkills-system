@@ -30,9 +30,9 @@ const topNavItems = [
 ];
 
 const bottomNavItems = [
-  { label: "Profile", href: "/internships#profile", icon: User },
-  { label: "Settings", href: "/internships#settings", icon: Settings },
-  { label: "Help & Support", href: "/internships#help", icon: HelpCircle },
+  { label: "Profile", href: "/profile", icon: User },
+  { label: "Settings", href: "/settings", icon: Settings },
+  { label: "Help & Support", href: "/help", icon: HelpCircle },
 ];
 
 export default function DashboardSidebar() {
@@ -40,7 +40,8 @@ export default function DashboardSidebar() {
 
   const isActive = (href) => {
     if (href === "/internships") return pathname === "/internships";
-    return false;
+    if (href === "/profile") return pathname === "/profile";
+    return pathname === href;
   };
 
   return (
@@ -105,17 +106,24 @@ export default function DashboardSidebar() {
 
         {/* ──── Bottom Navigation ──── */}
         <ul className="mt-6 mb-6 space-y-1">
-          {bottomNavItems.map(({ label, href, icon: Icon }) => (
-            <li key={label}>
-              <Link
-                href={href}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-white/90 hover:bg-white/15 hover:text-white transition-all duration-200"
-              >
-                <Icon className="w-[18px] h-[18px] shrink-0" />
-                <span>{label}</span>
-              </Link>
-            </li>
-          ))}
+          {bottomNavItems.map(({ label, href, icon: Icon }) => {
+            const active = isActive(href);
+            return (
+              <li key={label}>
+                <Link
+                  href={href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    active
+                      ? "bg-white text-[#2EB89D] shadow-sm"
+                      : "text-white/90 hover:bg-white/15 hover:text-white"
+                  }`}
+                >
+                  <Icon className="w-[18px] h-[18px] shrink-0" />
+                  <span>{label}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </aside>
