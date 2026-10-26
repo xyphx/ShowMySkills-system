@@ -8,7 +8,7 @@ export const loginConfigs = {
         id: "fullName",
         label: "Full Name",
         type: "text",
-        placeholder: "e.g. Asma Naureen",
+        placeholder: "e.g. Tara Joshi",
         icon: "user", // Identifier for icon rendering
       },
       {
@@ -36,14 +36,14 @@ export const loginConfigs = {
         id: "companyName",
         label: "Company Name",
         type: "text",
-        placeholder: "e.g. xphy company",
+        placeholder: "e.g. XYZ Company",
         icon: "building",
       },
       {
         id: "email",
         label: "Office Email Address",
         type: "email",
-        placeholder: "you@company.com",
+        placeholder: "hello@xyzcompany.com",
         icon: "email",
       },
       {
@@ -64,7 +64,7 @@ export const loginConfigs = {
         id: "collegeName",
         label: "College Name",
         type: "text",
-        placeholder: "e.g. CBIT College",
+        placeholder: "e.g. National Institute of Technology",
         icon: "building",
       },
       {
@@ -72,6 +72,34 @@ export const loginConfigs = {
         label: "College Email Address",
         type: "email",
         placeholder: "you@university.edu",
+        icon: "email",
+      },
+      {
+        id: "password",
+        label: "Password",
+        type: "password",
+        placeholder: "••••••••",
+        icon: "lock",
+      },
+    ],
+  },
+  admin: {
+    roleTitle: "Admin Log In",
+    roleSubtitle: "Manage and monitor platform outcomes with showmyskills.",
+    illustration: "/images/admin-login.png",
+    fields: [
+      {
+        id: "fullName",
+        label: "Admin Name",
+        type: "text",
+        placeholder: "e.g. Jordan Hayes",
+        icon: "user",
+      },
+      {
+        id: "email",
+        label: "Admin Email Address",
+        type: "email",
+        placeholder: "admin@showmyskills.com",
         icon: "email",
       },
       {

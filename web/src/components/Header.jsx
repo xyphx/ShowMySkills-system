@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, Terminal, Briefcase, LogIn, ArrowRight } from "lucide-react";
+import { Terminal, Briefcase, LogIn, ArrowRight } from "lucide-react";
 
 export default function Header() {
   return (
@@ -7,7 +7,7 @@ export default function Header() {
       <div className="flex items-center space-x-6">
         <Link href="/" className="flex items-center space-x-2.5 group">
           <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-200">
-            <Sparkles className="w-5 h-5" />
+            <Terminal className="w-5 h-5" />
           </div>
           <span className="font-extrabold text-xl tracking-tight text-white group-hover:text-indigo-300 transition-colors">
             ShowMy<span className="text-indigo-400">Skills</span>
@@ -18,14 +18,11 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <Link href="#explore" className="text-slate-300 hover:text-white transition-colors">
-            Explore Skills
-          </Link>
-          <Link href="#how-it-works" className="text-slate-300 hover:text-white transition-colors">
+          <Link href="/about" className="text-slate-300 hover:text-white transition-colors">
             How It Works
           </Link>
-          <Link href="#showcase" className="text-slate-300 hover:text-white transition-colors">
-            Showcase
+          <Link href="/people" className="text-slate-300 hover:text-white transition-colors">
+            People Showcase
           </Link>
           <Link href="https://showmyskills.xyphx.com/api/docs" target="_blank" className="text-slate-300 hover:text-white transition-colors flex items-center gap-1">
             API Docs

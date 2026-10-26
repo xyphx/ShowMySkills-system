@@ -1,71 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   MessageSquare,
   Send,
   Search,
-  Sparkles,
   Paperclip,
   CheckCheck,
   GraduationCap,
 } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
-
-const conversations = [
-  {
-    id: 1,
-    name: "Joel A. Jacob",
-    role: "Frontend Developer Intern",
-    college: "College of Engineering Trivandrum",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/5a82e47de052e6b1e8a0daf000f4c7f2631701fe?width=180",
-    lastMessage: "Thank you for reviewing my GitHub repo! I would love to schedule the technical interview.",
-    time: "10:32 AM",
-    unread: 1,
-    messages: [
-      { sender: "company", text: "Hi Joel, we reviewed your ShowMySkills profile and were really impressed by your React projects.", time: "10:15 AM" },
-      { sender: "candidate", text: "Thank you for reviewing my GitHub repo! I would love to schedule the technical interview.", time: "10:32 AM" },
-    ],
-  },
-  {
-    id: 2,
-    name: "S SIDHARTH",
-    role: "UI/UX Product Design Intern",
-    college: "College of Engineering Trivandrum",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/ab8e554398afb86403d2a7da0c420fe67c60f085?width=180",
-    lastMessage: "I've attached the interactive Figma prototype link for the analytics dashboard.",
-    time: "Yesterday",
-    unread: 0,
-    messages: [
-      { sender: "company", text: "Hello Sidharth, can you share the interactive Figma component library you worked on?", time: "Yesterday" },
-      { sender: "candidate", text: "I've attached the interactive Figma prototype link for the analytics dashboard.", time: "Yesterday" },
-    ],
-  },
-];
+import { chatService } from "@/services/apiClient";
 
 export default function CompanyChatsPage() {
-  const [activeConv, setActiveConv] = useState(conversations[0]);
+  const [convList, setConvList] = useState([]);
+  const [activeConv, setActiveConv] = useState(null);
   const [inputText, setInputText] = useState("");
-  const [chatMessages, setChatMessages] = useState(conversations[0].messages);
+  const [chatMessages, setChatMessages] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    chatService.getConversations().then((res) => {
+      if (isMounted && res && Array.isArray(res) && res.length > 0) {
+        setConvList(res);
+        setActiveConv(res[0]);
+        setChatMessages(res[0].messages || []);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
+    const text = inputText.trim();
     const newMsg = {
       sender: "company",
-      text: inputText.trim(),
+      text,
       time: "Just now",
     };
     setChatMessages((prev) => [...prev, newMsg]);
     setInputText("");
+
+    if (activeConv) {
+      chatService.sendMessage(text, activeConv.id, activeConv.conversationId || activeConv.id);
+    }
   };
 
   const handleSelectConversation = (conv) => {
     setActiveConv(conv);
-    setChatMessages(conv.messages);
+    setChatMessages(conv.messages || []);
   };
 
   return (
@@ -98,63 +87,70 @@ export default function CompanyChatsPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
-                {conversations.map((conv) => {
-                  const active = activeConv.id === conv.id;
-                  return (
-                    <button
-                      key={conv.id}
-                      onClick={() => handleSelectConversation(conv)}
-                      className={`w-full p-4 text-left flex items-start gap-3 transition-colors cursor-pointer ${
-                        active ? "bg-[#E6F7F3]/40 border-r-4 border-[#4B9C93]" : "hover:bg-gray-50/60"
-                      }`}
-                    >
-                      <img
-                        src={conv.avatar}
-                        alt={conv.name}
-                        className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-gray-900 truncate">
-                            {conv.name}
-                          </span>
-                          <span className="text-[10px] text-gray-400">{conv.time}</span>
+                {convList.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-gray-400">
+                    No active candidate chats found.
+                  </div>
+                ) : (
+                  convList.map((conv) => {
+                    const active = activeConv?.id === conv.id;
+                    return (
+                      <button
+                        key={conv.id}
+                        onClick={() => handleSelectConversation(conv)}
+                        className={`w-full p-4 text-left flex items-start gap-3 transition-colors cursor-pointer ${
+                          active ? "bg-[#E6F7F3]/40 border-r-4 border-[#4B9C93]" : "hover:bg-gray-50/60"
+                        }`}
+                      >
+                        <img
+                          src={conv.avatar}
+                          alt={conv.name}
+                          className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-gray-900 truncate">
+                              {conv.name}
+                            </span>
+                            <span className="text-[10px] text-gray-400">{conv.time}</span>
+                          </div>
+                          <p className="text-[11px] text-[#4B9C93] font-semibold truncate">
+                            {conv.role}
+                          </p>
+                          <p className="text-[11px] text-gray-500 truncate mt-0.5">
+                            {conv.lastMessage}
+                          </p>
                         </div>
-                        <p className="text-[11px] text-[#4B9C93] font-semibold truncate">
-                          {conv.role}
-                        </p>
-                        <p className="text-[11px] text-gray-500 truncate mt-0.5">
-                          {conv.lastMessage}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
 
             {/* Right: Active Chat Window */}
-            <div className="flex-1 flex flex-col bg-[#FAFBFB]">
-              {/* Chat Header */}
-              <div className="p-4 bg-white border-b border-gray-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={activeConv.avatar}
-                    alt={activeConv.name}
-                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                  />
-                  <div>
-                    <h3 className="font-bold text-sm text-gray-900">{activeConv.name}</h3>
-                    <p className="text-xs text-gray-400">{activeConv.college} • {activeConv.role}</p>
+            {activeConv ? (
+              <div className="flex-1 flex flex-col bg-[#FAFBFB]">
+                {/* Chat Header */}
+                <div className="p-4 bg-white border-b border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={activeConv.avatar}
+                      alt={activeConv.name}
+                      className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                    />
+                    <div>
+                      <h3 className="font-bold text-sm text-gray-900">{activeConv.name}</h3>
+                      <p className="text-xs text-gray-400">{activeConv.college} • {activeConv.role}</p>
+                    </div>
                   </div>
+                  <Link
+                    href={`/company/applications?candidate=${activeConv.id}`}
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#E6F7F3] text-[#4B9C93] hover:bg-[#d8f3ec] transition-colors"
+                  >
+                    View Application
+                  </Link>
                 </div>
-                <Link
-                  href={`/company/applications?candidate=${activeConv.id}`}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#E6F7F3] text-[#4B9C93] hover:bg-[#d8f3ec] transition-colors"
-                >
-                  View Application
-                </Link>
-              </div>
 
               {/* Chat History */}
               <div className="flex-1 p-6 overflow-y-auto space-y-4">
@@ -202,6 +198,13 @@ export default function CompanyChatsPage() {
                 </button>
               </form>
             </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-400 text-xs">
+                <MessageSquare className="w-10 h-10 text-gray-300 mb-2" />
+                <p className="font-semibold text-gray-600">No conversation selected</p>
+                <p className="text-gray-400 mt-1">Select an applicant to review application notes and send updates</p>
+              </div>
+            )}
           </div>
         </main>
       </div>

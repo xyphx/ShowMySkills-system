@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, GitMerge, Megaphone, Code2, Crown, Sparkles } from "lucide-react";
+import { ShieldCheck, GitMerge, Megaphone, Code2, Crown } from "lucide-react";
 
 /**
  * Valid student platform role tags:
@@ -76,7 +76,7 @@ export default function StudentRoleTag({
   const resolvedTag = tag === "Intern" ? "Promoter" : tag;
   const config = STUDENT_ROLE_TAGS[resolvedTag] || {
     label: tag,
-    icon: Sparkles,
+    icon: Code2,
     bg: "bg-slate-100",
     text: "text-slate-700",
     border: "border-slate-200",

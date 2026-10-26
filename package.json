@@ -1,0 +1,19 @@
+{
+  "name": "showmyskills-monorepo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "api:dev": "npm run dev --prefix api",
+    "api:start": "npm run start --prefix api",
+    "api:seed": "npm run seed --prefix api",
+    "api:test": "npm test --prefix api",
+    "web:dev": "npm run dev --prefix web",
+    "web:build": "npm run build --prefix web"
+  }
+}

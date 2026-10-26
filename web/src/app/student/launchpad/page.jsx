@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Search,
   SlidersHorizontal,
@@ -14,7 +14,6 @@ import {
   X,
   ExternalLink,
   Building2,
-  Sparkles,
   CheckCircle2,
   Share2,
   Globe,
@@ -24,141 +23,10 @@ import {
 
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
-
-// Top Verified Tech Internships data with real application links & stipend details
-const initialInternships = [
-  {
-    id: 1,
-    position: "VCA Consulting & Analytics Intern",
-    company: "Visa Inc.",
-    oneLiner: "Formulate strategic payment analytics & data-driven advisory for global banking clients.",
-    location: "Bengaluru / Mumbai, India (Hybrid)",
-    stipend: "₹75,000 - ₹90,000 / mo",
-    duration: "6 Months · Batch 2025/2026",
-    clicks: "1.8k clicks",
-    logoType: "visa",
-    applyUrl: "https://visa.wd5.myworkdayjobs.com/en-US/Visa_Early_Careers/job/VCA-Intern--IDS-_REF086121W",
-    skills: ["Data Analytics", "SQL", "Python"],
-    allSkills: ["Data Analytics", "SQL", "Python", "Client Advisory", "Financial Modeling", "Tableau"],
-    about: "Visa Consulting & Analytics (VCA) is the strategic consulting arm of Visa. We leverage Visa's rich transaction dataset and global industry knowledge to solve pressing business challenges for financial institutions and merchants.",
-    perks: "Pre-Placement Offer (PPO) opportunity, transit allowance, and comprehensive healthcare coverage.",
-  },
-  {
-    id: 2,
-    position: "Software Engineering Intern 2025",
-    company: "Atlassian",
-    oneLiner: "Build high-throughput microservices and collaborative UI primitives powering Jira & Confluence.",
-    location: "Bengaluru, India (Remote Eligible)",
-    stipend: "₹1,30,000 / mo",
-    duration: "Summer 2025 · 10-12 Weeks",
-    clicks: "2.4k clicks",
-    logoType: "atlassian",
-    applyUrl: "https://www.atlassian.com/company/careers/details/26273",
-    skills: ["Java / Kotlin", "React", "TypeScript"],
-    allSkills: ["Java / Kotlin", "React", "TypeScript", "Distributed Systems", "AWS", "Microservices"],
-    about: "Atlassian unleashes the potential of every team with products like Jira, Confluence, and Bitbucket. As a software engineering intern, you will contribute production code directly to millions of active developers worldwide.",
-    perks: "Top-tier stipend, home office stipend, wellness budget, and direct mentorship from Principal Engineers.",
-  },
-  {
-    id: 3,
-    position: "Software Engineering Intern",
-    company: "Google",
-    oneLiner: "Engineer high-scale distributed systems, search infrastructure, and production AI models.",
-    location: "Bengaluru / Hyderabad, India",
-    stipend: "₹1,15,000 / mo",
-    duration: "Summer 2025 · 10-12 Weeks",
-    clicks: "4.1k clicks",
-    logoType: "google",
-    applyUrl: "https://careers.google.com/jobs/results/?q=Software%20Engineering%20Intern",
-    skills: ["C++ / Java", "Python", "DSA"],
-    allSkills: ["C++ / Java", "Python", "Algorithms", "Distributed Systems", "Machine Learning", "Linux"],
-    about: "Google software engineering interns work on core products that impact billions of people daily. You will be matched with an engineering team to tackle challenging algorithmic and architectural problems.",
-    perks: "Free gourmet dining, relocation travel, housing assistance, and conversion opportunities for full-time SWE.",
-  },
-  {
-    id: 4,
-    position: "Software Engineer Intern (SDE)",
-    company: "Microsoft",
-    oneLiner: "Develop next-generation cloud services and enterprise tools on Azure & Windows Core.",
-    location: "Bengaluru / Hyderabad, India",
-    stipend: "₹1,25,000 / mo",
-    duration: "Summer 2025 · 8-12 Weeks",
-    clicks: "3.6k clicks",
-    logoType: "microsoft",
-    applyUrl: "https://careers.microsoft.com/us/en/search-results?keywords=Software%20Engineering%20Intern",
-    skills: ["C# / C++", "Azure Cloud", "Data Structures"],
-    allSkills: ["C# / C++", "Azure Cloud", "Data Structures", "Full Stack", "Distributed Computing", "APIs"],
-    about: "Microsoft engineers build technology that empowers every person and every organization on the planet to achieve more. Interns collaborate on high-stakes services across Azure, Windows, and AI infrastructure.",
-    perks: "Competitive stipend, corporate housing / transit support, and high full-time conversion rates (PPO).",
-  },
-  {
-    id: 5,
-    position: "Frontend Systems & Frameworks Intern",
-    company: "Vercel Inc.",
-    oneLiner: "Build cutting-edge edge compute runtimes and serverless primitives for the Next.js ecosystem.",
-    location: "San Francisco, CA · Global Remote",
-    stipend: "$8,000 / mo (~₹6.6L/mo)",
-    duration: "Flexible · 3-6 Months",
-    clicks: "2.1k clicks",
-    logoType: "vercel",
-    applyUrl: "https://vercel.com/careers",
-    skills: ["Next.js", "Serverless", "TypeScript"],
-    allSkills: ["Next.js", "Serverless", "TypeScript", "Edge Computing", "Turbo", "Web Performance"],
-    about: "Vercel is the creator of Next.js and the leading frontend cloud platform. You will work on developer experience tooling, edge runtime compilation, and high-performance framework internals.",
-    perks: "Fully remote flexibility, high-spec equipment stipend, and direct collaboration with world-class open-source creators.",
-  },
-  {
-    id: 6,
-    position: "Database Systems & Backend Intern",
-    company: "Supabase",
-    oneLiner: "Develop distributed PostgreSQL replication and realtime streaming database extensions.",
-    location: "Singapore · Remote Global",
-    stipend: "$5,000 / mo (~₹4.1L/mo)",
-    duration: "Summer 2025 · 3-4 Months",
-    clicks: "1.9k clicks",
-    logoType: "supabase",
-    applyUrl: "https://supabase.com/careers",
-    skills: ["PostgreSQL", "Go / Rust", "Docker"],
-    allSkills: ["PostgreSQL", "Go / Rust", "Docker", "Realtime DB", "Edge Functions", "Distributed Systems"],
-    about: "Supabase is an open source Firebase alternative built on PostgreSQL. Interns work directly on core open-source repositories handling realtime CDC, vector search, and edge authorization.",
-    perks: "100% remote asynchronous culture, open source attribution, and competitive global stipend.",
-  },
-  {
-    id: 7,
-    position: "Software Engineer Intern - Core Mobility",
-    company: "Uber Technologies",
-    oneLiner: "Build high-throughput dispatch algorithms and real-time geospatial routing engines.",
-    location: "Bengaluru / Hyderabad, India",
-    stipend: "₹1,60,000 / mo",
-    duration: "Summer 2025 · 2-3 Months",
-    clicks: "2.7k clicks",
-    logoType: "uber",
-    applyUrl: "https://www.uber.com/us/en/careers/list/",
-    skills: ["Golang / Java", "Microservices", "Kafka"],
-    allSkills: ["Golang / Java", "Microservices", "Kafka", "Algorithms", "Geospatial Indexing", "gRPC"],
-    about: "Uber connects the physical and digital worlds to help make movement happen at the push of a button. Interns engineer low-latency matchmaking algorithms, pricing engines, and safety telemetry.",
-    perks: "Industry-leading monthly stipend, Uber credits, meal benefits, and dedicated mentor pairing.",
-  },
-  {
-    id: 8,
-    position: "Software Development Engineer Intern",
-    company: "Amazon",
-    oneLiner: "Build fault-tolerant distributed web services supporting millions of active shoppers & AWS users.",
-    location: "Bengaluru / Chennai, India",
-    stipend: "₹1,10,000 / mo",
-    duration: "6 Months · Jan - Jun 2025",
-    clicks: "3.8k clicks",
-    logoType: "amazon",
-    applyUrl: "https://www.amazon.jobs/en/job_categories/software-development",
-    skills: ["Java", "AWS Cloud", "Distributed Systems"],
-    allSkills: ["Java", "AWS Cloud", "Distributed Systems", "OOP", "Database Design", "CI/CD"],
-    about: "Amazon SDE interns own and deploy features for production systems that touch millions of global consumers and enterprise cloud builders across Amazon Retail and AWS.",
-    perks: "Relocation assistance, comprehensive health insurance, Amazon employee discount, and PPO eligibility.",
-  },
-];
+import { launchpadService } from "@/services/apiClient";
 
 // Reusable Company Logo Component
-function CompanyLogo({ logoType, companyName }) {
+function CompanyLogo({ logoType, companyName = "" }) {
   if (logoType === "visa") {
     return (
       <div className="w-[84px] h-[84px] sm:w-[90px] sm:h-[90px] rounded-lg bg-[#1A1F71] flex items-center justify-center p-2 border border-blue-900 shadow-xs shrink-0">
@@ -247,12 +115,14 @@ function CompanyLogo({ logoType, companyName }) {
 
   return (
     <div className="w-[84px] h-[84px] sm:w-[90px] sm:h-[90px] rounded-lg bg-[#4B9C93] text-white flex items-center justify-center text-xl font-bold border border-[#4B9C93] shadow-xs shrink-0">
-      {companyName.slice(0, 2).toUpperCase()}
+      {companyName ? companyName.slice(0, 2).toUpperCase() : "INT"}
     </div>
   );
 }
 
 export default function StudentLaunchpadPage() {
+  const [internships, setInternships] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRoleType, setSelectedRoleType] = useState("all");
   const [showFilterModal, setShowFilterModal] = useState(false);
@@ -260,6 +130,39 @@ export default function StudentLaunchpadPage() {
   const [selectedInternship, setSelectedInternship] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    launchpadService.list({}).then((res) => {
+      if (!isMounted) return;
+      if (Array.isArray(res)) {
+        const formatted = res.map((item, idx) => ({
+          id: item._id || item.id || idx + 1,
+          position: item.position,
+          company: item.company,
+          oneLiner: item.oneLiner,
+          location: item.location || "",
+          stipend: item.stipend || "",
+          duration: item.duration || "",
+          clicks: item.clicks || (item.clickCount != null ? `${item.clickCount} clicks` : ""),
+          logoType: item.logoType || "generic",
+          applyUrl: item.applyUrl,
+          skills: item.skills || [],
+          allSkills: item.allSkills || item.skills || [],
+          about: item.about || "",
+          perks: item.perks || "",
+        }));
+        setInternships(formatted);
+      }
+      setLoading(false);
+    }).catch(() => {
+      if (isMounted) setLoading(false);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -282,7 +185,7 @@ export default function StudentLaunchpadPage() {
 
   // Filter internships based on search query & filters
   const filteredInternships = useMemo(() => {
-    return initialInternships.filter((item) => {
+    return internships.filter((item) => {
       if (selectedRoleType !== "all" && !item.position.toLowerCase().includes(selectedRoleType.toLowerCase())) {
         return false;
       }
@@ -297,7 +200,7 @@ export default function StudentLaunchpadPage() {
         item.allSkills.some((s) => s.toLowerCase().includes(q))
       );
     });
-  }, [searchQuery, selectedRoleType]);
+  }, [internships, searchQuery, selectedRoleType]);
 
   return (
     <div className="min-h-screen bg-[#F7F9F9] flex">
@@ -308,8 +211,8 @@ export default function StudentLaunchpadPage() {
       <div className="flex-1 md:ml-[220px] ml-0 flex flex-col min-h-screen relative pb-12">
         {/* Top Header */}
         <DashboardHeader
-          title="Welcome back, CBIT"
-          subtitle="Here's how your profile is performing this week"
+          title="Launchpad Opportunities"
+          subtitle="Explore verified engineering and product internships curated for you"
         />
 
         {/* Toast notification */}
@@ -449,7 +352,29 @@ export default function StudentLaunchpadPage() {
           )}
 
           {/* ──── Internship Cards Grid ──── */}
-          {filteredInternships.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 lg:gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sk) => (
+                <div
+                  key={sk}
+                  className="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-6 flex flex-col justify-between animate-pulse"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-[84px] h-[84px] sm:w-[90px] sm:h-[90px] rounded-lg bg-slate-200 shrink-0" />
+                    <div className="flex-1 space-y-2.5">
+                      <div className="h-5 bg-slate-200 rounded w-2/3" />
+                      <div className="h-3.5 bg-slate-100 rounded w-1/4" />
+                      <div className="h-3.5 bg-slate-100 rounded w-4/5" />
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <div className="h-6 bg-slate-100 rounded w-1/3" />
+                    <div className="h-7 bg-slate-200 rounded w-28" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredInternships.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center my-8 max-w-xl mx-auto shadow-xs">
               <div className="w-16 h-16 rounded-full bg-[#E6F7F3] text-[#4B9C93] flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8" />
@@ -565,6 +490,7 @@ export default function StudentLaunchpadPage() {
                         href={item.applyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => launchpadService.recordClick(item.id)}
                         className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-[#C5F1EC] hover:bg-[#b0eae3] text-xs font-semibold text-[#475569] hover:text-[#0F172A] flex items-center gap-1.5 transition-all cursor-pointer shadow-xs shrink-0"
                       >
                         <span>Apply Now</span>
@@ -701,9 +627,8 @@ export default function StudentLaunchpadPage() {
                   {(selectedInternship.allSkills || []).map((s) => (
                     <span
                       key={s}
-                      className="px-3 py-1 bg-[#F8FAFC] border border-gray-200 rounded-full text-xs font-medium text-gray-700 flex items-center gap-1.5"
+                      className="px-3 py-1 bg-[#F8FAFC] border border-gray-200 rounded-full text-xs font-medium text-gray-700"
                     >
-                      <Sparkles className="w-3 h-3 text-[#4B9C93]" />
                       {s}
                     </span>
                   ))}

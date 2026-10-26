@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   HelpCircle,
@@ -9,7 +9,6 @@ import {
   Mail,
   ChevronDown,
   Search,
-  Sparkles,
   CheckCircle2,
   Send,
   ExternalLink,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
+import { supportService } from "@/services/apiClient";
 
 const faqs = [
   {
@@ -43,6 +43,7 @@ const faqs = [
 ];
 
 export default function HelpSupportPage() {
+  const [faqList, setFaqList] = useState(faqs);
   const [searchQuery, setSearchQuery] = useState("");
   const [openFaq, setOpenFaq] = useState(0);
   const [ticketSubmitted, setTicketSubmitted] = useState(false);
@@ -52,7 +53,19 @@ export default function HelpSupportPage() {
     message: "",
   });
 
-  const filteredFaqs = faqs.filter(
+  useEffect(() => {
+    let isMounted = true;
+    supportService.getFaqs("", faqs).then((res) => {
+      if (isMounted && res && Array.isArray(res) && res.length > 0) {
+        setFaqList(res);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredFaqs = faqList.filter(
     (f) =>
       f.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
       f.a.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,6 +73,7 @@ export default function HelpSupportPage() {
 
   const handleSubmitTicket = (e) => {
     e.preventDefault();
+    supportService.submitTicket(ticket);
     setTicketSubmitted(true);
     setTicket({ subject: "", category: "General Inquiry", message: "" });
     setTimeout(() => setTicketSubmitted(false), 5000);

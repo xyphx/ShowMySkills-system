@@ -11,6 +11,14 @@ const internshipSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    companyLogoText: {
+      type: String,
+      default: '',
+    },
+    companyLogoSubText: {
+      type: String,
+      default: '',
+    },
     role: {
       type: String,
       required: true,
@@ -36,9 +44,13 @@ const internshipSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
-    duration: {
+    stipendText: {
       type: String,
       default: '',
+    },
+    duration: {
+      type: String,
+      default: '3 Months',
     },
     skills: {
       type: [String],
@@ -50,20 +62,49 @@ const internshipSchema = new mongoose.Schema(
     },
     employmentType: {
       type: String,
-      default: 'Internship',
+      default: 'Full time',
+    },
+    jobType: {
+      type: String,
+      default: 'Full time',
+    },
+    description: {
+      type: String,
+      default: '',
+    },
+    about: {
+      type: String,
+      default: '',
+    },
+    perks: {
+      type: String,
+      default: '',
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     status: {
       type: String,
-      enum: ['active', 'closed', 'draft'],
-      default: 'draft',
+      enum: ['active', 'closed', 'draft', 'pending_review', 'suspended'],
+      default: 'active',
     },
     applicationUrl: {
       type: String,
       default: '',
+    },
+    postedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    applicantsCount: {
+      type: Number,
+      default: 0,
     },
   },
   {
@@ -75,7 +116,8 @@ internshipSchema.index({
   company: 'text',
   role: 'text',
   skills: 'text',
+  description: 'text',
 });
 
-export default mongoose.models.Internship ||
-  mongoose.model('Internship', internshipSchema);
+export const Internship = mongoose.models.Internship || mongoose.model('Internship', internshipSchema);
+export default Internship;

@@ -1,6 +1,6 @@
 import { signupConfig } from '@/config/signupConfig';
 import { Signup } from '@/components/Signup';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 export function generateStaticParams() {
   return Object.keys(signupConfig).map((role) => ({ role }));
@@ -8,6 +8,11 @@ export function generateStaticParams() {
 
 export default async function Page({ params }) {
   const { role } = await params; // Next.js 15 params unwrapping
+
+  if (role === 'admin') {
+    redirect('/signup?role=admin');
+  }
+
   const config = signupConfig[role];
 
   if (!config) {

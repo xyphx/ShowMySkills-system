@@ -17,7 +17,7 @@ import {
  *
  * Supports:
  * - Mouse and touch swipe gestures.
- * - Animated ACCEPT and REJECT stamps.
+ * - Animated ACCEPT and SKIP stamps.
  * - Stacked cards with depth scaling.
  * - Programmatic swipe triggers via action buttons.
  * - Work mode display: Remote, Hybrid, or On-site.
@@ -51,7 +51,7 @@ export default function InternshipCard({
 
   // Swipe stamp opacity
   const acceptStampOpacity = useTransform(x, [20, 120], [0, 1]);
-  const rejectStampOpacity = useTransform(x, [-20, -120], [0, 1]);
+  const skipStampOpacity = useTransform(x, [-20, -120], [0, 1]);
 
   // Handle drag release
   const handleDragEnd = (_, info) => {
@@ -74,8 +74,8 @@ export default function InternshipCard({
   };
 
   // Background card stack
-  const targetScale = 1 - indexOffset * 0.05;
-  const targetY = indexOffset * 12;
+  const targetScale = 1 - indexOffset * 0.04;
+  const targetY = indexOffset * 8;
   const targetOpacity = 1 - indexOffset * 0.15;
   const cardZIndex = 50 - indexOffset * 10;
 
@@ -175,7 +175,7 @@ export default function InternshipCard({
       dragElastic={0.7}
       onDragEnd={handleDragEnd}
       whileTap={isTopCard ? { cursor: "grabbing" } : {}}
-      className={`absolute top-0 w-full max-w-[480px] bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 overflow-hidden select-none ${
+      className={`absolute top-0 left-0 w-full h-full aspect-square bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 overflow-hidden select-none flex flex-col justify-between ${
         isTopCard
           ? "cursor-grab active:cursor-grabbing"
           : "pointer-events-none"
@@ -185,105 +185,124 @@ export default function InternshipCard({
       {isTopCard && (
         <motion.div
           style={{ opacity: acceptStampOpacity }}
-          className="absolute top-6 left-6 z-40 border-4 border-[#4B9C93] text-[#4B9C93] bg-white/90 backdrop-blur-xs font-black text-lg sm:text-xl px-4 py-1 rounded-xl rotate-[-12deg] flex items-center gap-1.5 shadow-lg pointer-events-none"
+          className="absolute top-5 left-5 z-40 border-4 border-[#4B9C93] text-[#4B9C93] bg-white/90 backdrop-blur-xs font-black text-base sm:text-lg px-3.5 py-0.5 rounded-xl rotate-[-12deg] flex items-center gap-1.5 shadow-lg pointer-events-none"
         >
-          <CheckCircle className="w-6 h-6 stroke-[3]" />
+          <CheckCircle className="w-5 h-5 stroke-[3]" />
           ACCEPT
         </motion.div>
       )}
 
-      {/* REJECT stamp */}
+      {/* SKIP stamp */}
       {isTopCard && (
         <motion.div
-          style={{ opacity: rejectStampOpacity }}
-          className="absolute top-6 right-6 z-40 border-4 border-red-500 text-red-500 bg-white/90 backdrop-blur-xs font-black text-lg sm:text-xl px-4 py-1 rounded-xl rotate-[12deg] flex items-center gap-1.5 shadow-lg pointer-events-none"
+          style={{ opacity: skipStampOpacity }}
+          className="absolute top-5 right-5 z-40 border-4 border-red-500 text-red-500 bg-white/90 backdrop-blur-xs font-black text-base sm:text-lg px-3.5 py-0.5 rounded-xl rotate-[12deg] flex items-center gap-1.5 shadow-lg pointer-events-none"
         >
-          <XCircle className="w-6 h-6 stroke-[3]" />
-          REJECT
+          <XCircle className="w-5 h-5 stroke-[3]" />
+          SKIP
         </motion.div>
       )}
 
-      {/* Company logo area */}
-      <div className="relative px-5 pt-5 pb-3">
-        <div className="w-full h-[140px] rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 flex flex-col items-center justify-center gap-1">
-          <span className="text-2xl font-extrabold text-[#4B9C93] tracking-wider">
-            {companyLogoText}
-          </span>
+      {/* Company logo / image area (fills remaining balance space) */}
+      <div className="relative px-5 sm:px-6 pt-4 pb-2.5 flex-1 min-h-[120px] flex flex-col">
+        <div className="w-full h-full rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 flex flex-col items-center justify-center gap-1 overflow-hidden">
+          {internship.companyLogo ? (
+            <img
+              src={internship.companyLogo}
+              alt={companyName}
+              className="max-h-full max-w-full object-contain p-3"
+            />
+          ) : (
+            <>
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#4B9C93] tracking-wider">
+                {companyLogoText}
+              </span>
 
-          <span className="text-[10px] font-semibold text-gray-400 tracking-[0.25em] uppercase">
-            {companyLogoSubText}
-          </span>
+              {companyLogoSubText && (
+                <span className="text-[10px] sm:text-[11px] font-semibold text-gray-400 tracking-[0.25em] uppercase">
+                  {companyLogoSubText}
+                </span>
+              )}
+            </>
+          )}
         </div>
 
         {/* Verified badge */}
         {isVerified && (
-          <span className="absolute top-8 right-8 inline-flex items-center gap-1 text-[11px] font-semibold text-[#4B9C93] bg-[#E6F7F3] border border-[#4B9C93]/20 rounded-full px-2.5 py-0.5">
-            <BadgeCheck className="w-3 h-3" />
+          <span className="absolute top-6 right-7 sm:right-8 inline-flex items-center gap-1 text-[11px] font-semibold text-[#4B9C93] bg-[#E6F7F3] border border-[#4B9C93]/20 rounded-full px-2.5 py-0.5 shadow-2xs">
+            <BadgeCheck className="w-3.5 h-3.5" />
             Verified
           </span>
         )}
       </div>
 
-      {/* Card body */}
-      <div className="px-5 pb-5">
-        {/* Role and company */}
-        <h2 className="text-[17px] font-bold text-gray-900 leading-snug">
-          {roleTitle}
-        </h2>
+      {/* Card body (anchored to bottom) */}
+      <div className="px-5 sm:px-6 pb-4 shrink-0 flex flex-col">
+        <div>
+          {/* Role and company */}
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-snug truncate">
+            {roleTitle}
+          </h2>
 
-        <p className="text-sm text-gray-500 mt-0.5 mb-3">
-          {companyName}
-        </p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 mb-2 truncate">
+            {companyName}
+          </p>
 
-        {/* Metadata row */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-gray-600 mb-3">
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-gray-400" />
-            {location || "Location not specified"}
-          </span>
-
-          <span className="inline-flex items-center gap-1.5">
-            <Monitor className="w-3.5 h-3.5 text-gray-400" />
-            {workMode}
-          </span>
-
-          <span className="inline-flex items-center gap-1.5">
-            <Wallet className="w-3.5 h-3.5 text-gray-400" />
-            {stipend || "Unpaid"}
-          </span>
-
-          <span className="inline-flex items-center gap-1.5">
-            <CalendarDays className="w-3.5 h-3.5 text-gray-400" />
-            {duration || "Not specified"}
-          </span>
-        </div>
-
-        {/* Description */}
-        <p className="text-[13px] text-gray-500 leading-relaxed mb-4 line-clamp-2">
-          <span className="text-gray-400 mr-1">📋</span>
-          {description || "No description available."}
-        </p>
-
-        {/* Skills tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {skills.map((skill) => (
-            <span
-              key={skill}
-              className="text-[11px] font-semibold text-[#4B9C93] bg-[#E6F7F3] px-3 py-1 rounded-full"
-            >
-              {skill}
+          {/* Metadata row */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-600 mb-2">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <span className="truncate">{location || "Remote"}</span>
             </span>
-          ))}
+
+            <span className="inline-flex items-center gap-1.5">
+              <Monitor className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <span>{workMode}</span>
+            </span>
+
+            <span className="inline-flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <span>{stipend || "Unpaid"}</span>
+            </span>
+
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <span>{duration || "N/A"}</span>
+            </span>
+          </div>
+
+          {/* Description */}
+          <p className="text-xs sm:text-[13px] text-gray-500 leading-relaxed mb-2.5 line-clamp-2">
+            <span className="text-gray-400 mr-1">📋</span>
+            {description || "No description available."}
+          </p>
+
+          {/* Skills tags */}
+          <div className="flex flex-wrap gap-1.5 mb-2.5">
+            {skills.slice(0, 6).map((skill) => (
+              <span
+                key={skill}
+                className="text-[11px] font-semibold text-[#4B9C93] bg-[#E6F7F3] px-2.5 py-0.5 rounded-full"
+              >
+                {skill}
+              </span>
+            ))}
+            {skills.length > 6 && (
+              <span className="text-[11px] text-gray-400 self-center">
+                +{skills.length - 6}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <span className="text-[11px] font-medium text-gray-500 border border-gray-200 rounded-full px-3 py-1">
+        <div className="flex items-center justify-between pt-2.5 border-t border-gray-100 shrink-0">
+          <span className="text-[11px] font-medium text-gray-500 border border-gray-200 rounded-full px-2.5 py-0.5">
             {jobType || "Internship"}
           </span>
 
           <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
-            <Clock className="w-3 h-3" />
+            <Clock className="w-3.5 h-3.5" />
             {postedTime || "Recently posted"}
           </span>
         </div>

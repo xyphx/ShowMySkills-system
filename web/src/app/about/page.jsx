@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   Users,
   Award,
-  Sparkles,
+  Code2,
   CheckCircle2,
   Target,
   ArrowRight,
@@ -158,7 +158,7 @@ export default function AboutPage() {
             {/* Card 3: Skill Showcase */}
             <div className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-[#DBEAFE] text-[#155DFC] flex items-center justify-center mb-5 shrink-0">
-                <Sparkles className="w-8 h-8" strokeWidth={2.2} />
+                <Code2 className="w-8 h-8" strokeWidth={2.2} />
               </div>
               <h3 className="text-xl font-bold text-[#101828]">
                 Skill Showcase

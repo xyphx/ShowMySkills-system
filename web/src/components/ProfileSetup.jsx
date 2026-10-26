@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Camera, GraduationCap, Plus, Trash2, UserRound } from "lucide-react";
+import { apiRequest } from "@/services/apiClient";
 
 function TagsInput({ id, field, value = [], onChange }) {
   const [input, setInput] = useState("");
@@ -114,7 +115,7 @@ export function ProfileSetup({ role, config }) {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (step < totalSteps) {
       setStep(step + 1);
@@ -122,7 +123,16 @@ export function ProfileSetup({ role, config }) {
       return;
     }
 
-    setSaveMessage("Profile saving is not connected yet. Your changes have not been saved.");
+    try {
+      await apiRequest("/auth/me", "PUT", {
+        profile: values,
+        sections: repeatableValues,
+        role,
+      });
+      setSaveMessage("Profile setup saved successfully!");
+    } catch (err) {
+      setSaveMessage(err.message || "Failed to save profile. Please try again.");
+    }
   };
 
   return (

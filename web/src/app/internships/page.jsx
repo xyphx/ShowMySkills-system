@@ -9,7 +9,6 @@ import {
   Bookmark,
   Check,
   RotateCcw,
-  Sparkles,
   MapPin,
   CalendarDays,
   Wallet,
@@ -25,7 +24,6 @@ import {
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import InternshipCard from "@/features/internships/InternshipCard";
-import { mockInternships } from "@/features/internships/mockData";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -258,11 +256,10 @@ export default function InternshipsPage() {
       setAllInternships(mapped);
       setCards(mapped.filter((item) => !actionedIds.has(item.id)));
     } catch (error) {
-      console.warn("Backend API unreachable, using sample internships:", error);
-      // Seamless fallback to mock data when backend is not running
-      setAllInternships(mockInternships);
-      setCards(mockInternships);
-      setApiError("");
+      console.warn("Backend API unreachable:", error);
+      setAllInternships([]);
+      setCards([]);
+      setApiError("Unable to load internships from database server.");
     } finally {
       setLoading(false);
     }
@@ -331,13 +328,6 @@ export default function InternshipsPage() {
     );
   });
 
-  const tabs = [
-    { id: "Internships", label: "Discovery Deck" },
-    { id: "Saved", label: `Saved (${savedItems.length})` },
-    { id: "Accepted", label: `Accepted (${acceptedItems.length})` },
-    { id: "Jobs", label: "Jobs" },
-    { id: "Companies", label: "Companies" },
-  ];
 
   const showToast = (message) => {
     setToastMessage(message);
@@ -367,7 +357,7 @@ export default function InternshipsPage() {
 
       const messages = {
         right: `Interested in ${activeCard.roleTitle}`,
-        left: `Passed on ${activeCard.roleTitle}`,
+        left: `Skipped ${activeCard.roleTitle}`,
         save: `Saved ${activeCard.roleTitle}`,
       };
       showToast(messages[direction]);
@@ -407,7 +397,7 @@ export default function InternshipsPage() {
 
       const messages = {
         right: `Interested in ${activeCard.roleTitle}`,
-        left: `Passed on ${activeCard.roleTitle}`,
+        left: `Skipped ${activeCard.roleTitle}`,
         save: `Saved ${activeCard.roleTitle}`,
       };
       showToast(messages[direction]);
@@ -478,10 +468,10 @@ export default function InternshipsPage() {
     loading || Boolean(apiError) || filteredCards.length === 0;
 
   return (
-    <div className="min-h-screen bg-[#F7F9F9] flex">
+    <div className="h-screen bg-[#F7F9F9] flex overflow-hidden">
       <DashboardSidebar />
 
-      <div className="flex-1 md:ml-[220px] ml-0 flex flex-col min-h-screen relative">
+      <div className="flex-1 md:ml-[220px] ml-0 flex flex-col h-screen overflow-hidden relative">
         <DashboardHeader />
 
         {/* Toast notifications */}
@@ -493,18 +483,18 @@ export default function InternshipsPage() {
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-gray-900/90 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg flex items-center gap-2"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#4B9C93]" />
+              <CheckCircle className="w-3.5 h-3.5 text-[#4B9C93]" />
               {toastMessage}
             </motion.div>
           )}
         </AnimatePresence>
 
-        <main className="flex-1 flex flex-col items-center px-4 sm:px-6 py-6 overflow-y-auto">
+        <main className="flex-1 flex flex-col items-center px-4 sm:px-6 py-2 sm:py-3 overflow-y-auto min-h-0">
           {/* ──── Search Bar & Filter Button ──── */}
-          <div className="flex items-center gap-3 sm:gap-4 mb-8 w-full max-w-4xl mx-auto">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-2.5 w-full max-w-3xl mx-auto shrink-0">
             {/* Search Input Container */}
-            <div className="flex-1 relative flex items-center bg-white border-2 border-[#E5E6E5] rounded-full h-14 sm:h-16 px-5 sm:px-6 shadow-xs focus-within:border-[#4B9C93] focus-within:ring-2 focus-within:ring-[#4B9C93]/15 transition-all">
-              <Search className="w-5 h-5 text-[#292D32] shrink-0" strokeWidth={2} />
+            <div className="flex-1 relative flex items-center bg-white border-2 border-[#E5E6E5] rounded-full h-11 sm:h-12 px-4 sm:px-5 shadow-xs focus-within:border-[#4B9C93] focus-within:ring-2 focus-within:ring-[#4B9C93]/15 transition-all">
+              <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#292D32] shrink-0" strokeWidth={2} />
               <input
                 id="internship-search"
                 type="text"
@@ -516,7 +506,7 @@ export default function InternshipsPage() {
                     handleApplyFilters();
                   }
                 }}
-                className="w-full bg-transparent pl-3 sm:pl-4 pr-3 text-sm sm:text-[15px] font-medium text-[#101828] placeholder:text-[#67727A]/80 focus:outline-none"
+                className="w-full bg-transparent pl-2.5 sm:pl-3 pr-2 text-xs sm:text-sm font-medium text-[#101828] placeholder:text-[#67727A]/80 focus:outline-none"
               />
               {searchQuery && (
                 <button
@@ -525,7 +515,7 @@ export default function InternshipsPage() {
                   aria-label="Clear search"
                   className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -538,11 +528,11 @@ export default function InternshipsPage() {
                 aria-label="Toggle filters"
                 aria-expanded={showFilters}
                 onClick={() => setShowFilters((previous) => !previous)}
-                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[#E5E6E5] bg-white flex items-center justify-center shrink-0 cursor-pointer shadow-xs hover:border-[#4B9C93] hover:bg-[#F8FAFC] transition-all ${
+                className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#E5E6E5] bg-white flex items-center justify-center shrink-0 cursor-pointer shadow-xs hover:border-[#4B9C93] hover:bg-[#F8FAFC] transition-all ${
                   showFilters ? "border-[#4B9C93] ring-2 ring-[#4B9C93]/20" : ""
                 }`}
               >
-                <SlidersHorizontal className="w-5 h-5 sm:w-6 sm:h-6 text-[#292D32]" strokeWidth={2} />
+                <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-[#292D32]" strokeWidth={2} />
               </button>
             )}
           </div>
@@ -699,43 +689,25 @@ export default function InternshipsPage() {
             )}
           </AnimatePresence>
 
-          {/* Navigation Tabs */}
-          <div className="flex items-center flex-wrap justify-center gap-2.5 mb-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                id={`tab-${tab.id.toLowerCase()}`}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                  activeTab === tab.id
-                    ? "bg-[#4B9C93] text-white shadow-md shadow-[#4B9C93]/20"
-                    : "bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
 
           {/* ──────────────── TAB CONTENT ──────────────── */}
           {activeTab === "Internships" ? (
-            <>
+            <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0">
               {/* Internship Swipe Deck */}
-              <div className="relative w-full max-w-[480px] h-[470px] mb-8 flex items-center justify-center">
+              <div className="relative w-[400px] sm:w-[430px] md:w-[450px] lg:w-[460px] h-[400px] sm:h-[430px] md:h-[450px] lg:h-[460px] max-w-[92vw] aspect-square mb-2 sm:mb-2.5 flex items-center justify-center shrink-0">
                 {loading ? (
                   <div className="flex flex-col items-center gap-3 text-sm text-gray-500">
                     <div className="w-8 h-8 border-4 border-[#4B9C93]/20 border-t-[#4B9C93] rounded-full animate-spin" />
                     Loading internships...
                   </div>
                 ) : apiError ? (
-                  <div className="w-full bg-white rounded-2xl p-8 text-center shadow-lg">
-                    <p className="text-sm text-red-600 mb-5">{apiError}</p>
+                  <div className="w-full h-full bg-white rounded-2xl p-6 text-center shadow-lg flex flex-col items-center justify-center">
+                    <p className="text-sm text-red-600 mb-4">{apiError}</p>
 
                     <button
                       type="button"
                       onClick={() => fetchInternships()}
-                      className="px-6 py-2.5 rounded-full bg-[#4B9C93] text-white text-sm font-semibold hover:bg-[#3d867e]"
+                      className="px-5 py-2 rounded-full bg-[#4B9C93] text-white text-xs sm:text-sm font-semibold hover:bg-[#3d867e]"
                     >
                       Try Again
                     </button>
@@ -759,29 +731,29 @@ export default function InternshipsPage() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="w-full max-w-[480px] bg-white rounded-2xl p-8 border border-gray-100 shadow-xl shadow-black/5 flex flex-col items-center text-center"
+                    className="w-full h-full aspect-square bg-white rounded-2xl p-6 sm:p-7 border border-gray-100 shadow-xl shadow-black/5 flex flex-col items-center justify-center text-center"
                   >
-                    <div className="w-16 h-16 rounded-full bg-[#E6F7F3] border border-[#4B9C93]/20 flex items-center justify-center text-[#4B9C93] mb-4">
-                      <Sparkles className="w-8 h-8" />
+                    <div className="w-12 h-12 rounded-full bg-[#E6F7F3] border border-[#4B9C93]/20 flex items-center justify-center text-[#4B9C93] mb-3">
+                      <CheckCircle className="w-6 h-6" />
                     </div>
 
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
                       {searchQuery ? "No matches found" : "All caught up! 🎉"}
                     </h3>
 
-                    <p className="text-sm text-gray-500 max-w-[320px] mb-6 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-500 max-w-[320px] mb-4 leading-relaxed">
                       {searchQuery
                         ? "Try another company, role, or skill."
-                        : "No more new internships in the discovery deck. View your Saved or Accepted tabs above, or reload."}
+                        : "No more new internships in the discovery deck. You can reload the list to review the opportunities again."}
                     </p>
 
                     <button
                       id="reload-deck-btn"
                       type="button"
                       onClick={handleReloadDeck}
-                      className="px-6 py-2.5 rounded-full bg-[#4B9C93] text-white text-sm font-semibold hover:bg-[#3d867e] active:scale-95 shadow-md shadow-[#4B9C93]/25 transition-all duration-200 flex items-center gap-2 cursor-pointer"
+                      className="px-5 py-2 rounded-full bg-[#4B9C93] text-white text-xs sm:text-sm font-semibold hover:bg-[#3d867e] active:scale-95 shadow-md shadow-[#4B9C93]/25 transition-all duration-200 flex items-center gap-2 cursor-pointer"
                     >
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-3.5 h-3.5" />
                       Reload Internships
                     </button>
                   </motion.div>
@@ -789,73 +761,73 @@ export default function InternshipsPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex items-center gap-8 mb-8">
-                {/* Reject */}
-                <div className="flex flex-col items-center gap-1.5">
+              <div className="flex items-center gap-6 sm:gap-8 mb-2 sm:mb-2.5 shrink-0">
+                {/* Skip */}
+                <div className="flex flex-col items-center gap-1">
                   <button
-                    id="action-reject"
+                    id="action-skip"
                     type="button"
                     onClick={() => triggerButtonSwipe("left")}
                     disabled={actionsDisabled}
-                    aria-label="Reject internship"
-                    className={`w-14 h-14 rounded-full bg-white border-2 border-red-400 flex items-center justify-center text-red-400 shadow-md shadow-red-100/50 transition-all duration-200 ${
+                    aria-label="Skip internship"
+                    className={`w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-white border-2 border-red-400 flex items-center justify-center text-red-400 shadow-md shadow-red-100/50 transition-all duration-200 ${
                       actionsDisabled
                         ? "opacity-40 cursor-not-allowed"
                         : "hover:bg-red-50 hover:scale-110 active:scale-95 cursor-pointer"
                     }`}
                   >
-                    <X className="w-6 h-6" strokeWidth={2.5} />
+                    <X className="w-5 h-5 sm:w-5.5 sm:h-5.5" strokeWidth={2.5} />
                   </button>
-                  <span className="text-xs text-gray-500 font-medium">
-                    Reject
+                  <span className="text-[11px] sm:text-xs text-gray-500 font-medium">
+                    Skip
                   </span>
                 </div>
 
                 {/* Save */}
-                <div className="flex flex-col items-center gap-1.5">
+                <div className="flex flex-col items-center gap-1">
                   <button
                     id="action-save"
                     type="button"
                     onClick={() => triggerButtonSwipe("save")}
                     disabled={actionsDisabled}
                     aria-label="Save internship"
-                    className={`w-14 h-14 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center text-gray-400 shadow-md shadow-gray-100/50 transition-all duration-200 ${
+                    className={`w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center text-gray-400 shadow-md shadow-gray-100/50 transition-all duration-200 ${
                       actionsDisabled
                         ? "opacity-40 cursor-not-allowed"
                         : "hover:bg-gray-50 hover:border-gray-400 hover:text-gray-600 hover:scale-110 active:scale-95 cursor-pointer"
                     }`}
                   >
-                    <Bookmark className="w-6 h-6" strokeWidth={2} />
+                    <Bookmark className="w-5 h-5 sm:w-5.5 sm:h-5.5" strokeWidth={2} />
                   </button>
-                  <span className="text-xs text-gray-500 font-medium">
+                  <span className="text-[11px] sm:text-xs text-gray-500 font-medium">
                     Save
                   </span>
                 </div>
 
                 {/* Accept */}
-                <div className="flex flex-col items-center gap-1.5">
+                <div className="flex flex-col items-center gap-1">
                   <button
                     id="action-accept"
                     type="button"
                     onClick={() => triggerButtonSwipe("right")}
                     disabled={actionsDisabled}
                     aria-label="Accept internship"
-                    className={`w-14 h-14 rounded-full bg-white border-2 border-[#4B9C93] flex items-center justify-center text-[#4B9C93] shadow-md shadow-[#4B9C93]/10 transition-all duration-200 ${
+                    className={`w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-white border-2 border-[#4B9C93] flex items-center justify-center text-[#4B9C93] shadow-md shadow-[#4B9C93]/10 transition-all duration-200 ${
                       actionsDisabled
                         ? "opacity-40 cursor-not-allowed"
                         : "hover:bg-[#E6F7F3] hover:scale-110 active:scale-95 cursor-pointer"
                     }`}
                   >
-                    <Check className="w-6 h-6" strokeWidth={2.5} />
+                    <Check className="w-5 h-5 sm:w-5.5 sm:h-5.5" strokeWidth={2.5} />
                   </button>
-                  <span className="text-xs text-gray-500 font-medium">
+                  <span className="text-[11px] sm:text-xs text-gray-500 font-medium">
                     Accept
                   </span>
                 </div>
               </div>
 
               {/* Progress indicators */}
-              <div className="flex items-center gap-1.5 mb-4">
+              <div className="flex items-center gap-1.5 mb-1 shrink-0">
                 {allInternships.map((internship) => {
                   const isRemaining = cards.some(
                     (card) => card.id === internship.id
@@ -869,18 +841,18 @@ export default function InternshipsPage() {
                     <div
                       key={internship.id}
                       title={internship.roleTitle}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                      className={`h-1 sm:h-1.5 rounded-full transition-all duration-300 ${
                         isCurrent
-                          ? "w-6 bg-[#4B9C93]"
+                          ? "w-5 sm:w-6 bg-[#4B9C93]"
                           : !isRemaining
-                          ? "w-1.5 bg-[#4B9C93]/40"
-                          : "w-1.5 bg-gray-200"
+                          ? "w-1 sm:w-1.5 bg-[#4B9C93]/40"
+                          : "w-1 sm:w-1.5 bg-gray-200"
                       }`}
                     />
                   );
                 })}
               </div>
-            </>
+            </div>
           ) : activeTab === "Saved" ? (
             /* ──────────────── SAVED INTERNSHIPS VIEW ──────────────── */
             <div className="w-full max-w-[720px] flex flex-col gap-4 mb-8">

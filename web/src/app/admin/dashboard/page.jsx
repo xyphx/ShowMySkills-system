@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -17,115 +17,99 @@ import {
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import StudentRoleTag, { STUDENT_ROLE_TAGS } from "@/components/StudentRoleTag";
-
-const initialStudents = [
-  {
-    id: 1,
-    name: "Joel A. Jacob",
-    email: "joel.jacob@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Computer Science (AI & ML)",
-    tag: "Maintainer",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/5a82e47de052e6b1e8a0daf000f4c7f2631701fe?width=180",
-    score: 23,
-  },
-  {
-    id: 2,
-    name: "S SIDHARTH",
-    email: "sidharth.s@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    tag: "Admin",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/ab8e554398afb86403d2a7da0c420fe67c60f085?width=180",
-    score: 63,
-  },
-  {
-    id: 3,
-    name: "Reshma Udhayan",
-    email: "reshma.u@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    tag: "Promoter",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/c3059191c12486377929540d913e78b03ba9bddc?width=180",
-    score: 72,
-  },
-  {
-    id: 4,
-    name: "Vaishnav RL",
-    email: "vaishnav.rl@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    tag: "Ambassador",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/46fce00ed55aca498d8347d953abdc65e3ba2655?width=180",
-    score: 81,
-  },
-  {
-    id: 5,
-    name: "Abhay SA",
-    email: "abhay.sa@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    tag: "Contributor",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/f7559f012fcf86117c87ef912259ea3d4b2467c5?width=180",
-    score: 72,
-  },
-  {
-    id: 6,
-    name: "Rishi Chandran",
-    email: "rishi.c@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    tag: "Ambassador",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/ffe52c79545b2a85e56e27f28c8198d4551e8795?width=180",
-    score: 81,
-  },
-  {
-    id: 7,
-    name: "asher john",
-    email: "asher.john@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Computer Science (AI & ML)",
-    tag: "Promoter",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/c108ffdec7504150607ccddcecf48749b1c50f54?width=180",
-    score: 23,
-  },
-  {
-    id: 8,
-    name: "Devikripa S",
-    email: "devikripa.s@cet.ac.in",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    tag: "Contributor",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/a5bb5f84222369dfc64ce1f696c04fdc36d5fa89?width=180",
-    score: 63,
-  },
-];
-
-const kpis = [
-  { label: "Registered Students", value: "12,480", status: "+480 this week", icon: Users, color: "text-[#4B9C93]", bg: "bg-[#E6F7F3]" },
-  { label: "Partner Companies", value: "340", status: "24 awaiting approval", icon: Building2, color: "text-blue-600", bg: "bg-blue-50" },
-  { label: "Active Internships", value: "892", status: "98% verified", icon: Briefcase, color: "text-purple-600", bg: "bg-purple-50" },
-  { label: "Skills Verified", value: "4,620", status: "+120 today", icon: CheckCircle, color: "text-amber-600", bg: "bg-amber-50" },
-];
-
-const pendingVerifications = [
-  { id: 1, name: "Joel A. Jacob", college: "CET", skill: "Full Stack React / Next.js", score: "93%", type: "Assessment Audit", date: "Oct 19" },
-  { id: 2, name: "S Sidharth", college: "CET", skill: "Product Design & Systems", score: "96%", type: "Portfolio Review", date: "Oct 19" },
-  { id: 3, name: "CBIT College", college: "Hyderabad", skill: "Institutional Placement Handle", score: "Verified", type: "College Accreditation", date: "Oct 18" },
-  { id: 4, name: "xphy Technologies", college: "Bengaluru", skill: "Employer Hiring License", score: "Verified", type: "Company Verification", date: "Oct 18" },
-];
+import { adminService } from "@/services/apiClient";
 
 export default function AdminDashboardPage() {
-  const [verifications, setVerifications] = useState(pendingVerifications);
-  const [students, setStudents] = useState(initialStudents);
+  const [verifications, setVerifications] = useState([]);
+  const [adminApplications, setAdminApplications] = useState([]);
+  const [students, setStudents] = useState([]);
   const [selectedTagFilter, setSelectedTagFilter] = useState("all");
   const [studentSearch, setStudentSearch] = useState("");
   const [tagToast, setTagToast] = useState("");
+  const [adminActionToast, setAdminActionToast] = useState("");
+  const [overview, setOverview] = useState({
+    totalStudents: 0,
+    totalCompanies: 0,
+    totalInternships: 0,
+    totalApplications: 0,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    adminService.getOverview().then((res) => {
+      if (isMounted && res) {
+        setOverview(res);
+      }
+    }).catch(() => {});
+
+    adminService.getUsers({ role: "student" }).then((res) => {
+      if (isMounted && res && Array.isArray(res)) {
+        const mapped = res.map((u, i) => ({
+          id: u._id || u.id || i + 1,
+          name: u.name,
+          email: u.email,
+          college: u.college || "",
+          department: u.branch || u.course || "",
+          tag: u.roleTag || "Student",
+          avatar: u.profileIcon || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || "Student")}&background=4B9C93&color=fff&size=180`,
+          score: u.reputationScore ?? u.score ?? 0,
+        }));
+        setStudents(mapped);
+      }
+    }).catch(() => {});
+
+    adminService.getVerifications({}).then((res) => {
+      if (isMounted && res && Array.isArray(res)) {
+        setVerifications(res);
+      }
+    }).catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const tagOptions = Object.keys(STUDENT_ROLE_TAGS);
 
+  const handleApproveAdminApp = async (appId) => {
+    const targetApp = adminApplications.find((a) => a.id === appId);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      await fetch(
+        `${baseUrl.replace(/\/$/, "")}/admin-applications/${appId}/approve`,
+        { method: "POST" }
+      ).catch(() => {});
+    } catch {}
+
+    setAdminApplications((prev) => prev.filter((a) => a.id !== appId));
+    setAdminActionToast(
+      `Approved ${targetApp?.name || "Applicant"}. Admin access granted, and their photo is now activated as their public profile icon.`
+    );
+    setTimeout(() => setAdminActionToast(""), 5000);
+  };
+
+  const handleRejectAdminApp = async (appId) => {
+    const targetApp = adminApplications.find((a) => a.id === appId);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      await fetch(
+        `${baseUrl.replace(/\/$/, "")}/admin-applications/${appId}/reject`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: "Declined by core admin review" }),
+        }
+      ).catch(() => {});
+    } catch {}
+
+    setAdminApplications((prev) => prev.filter((a) => a.id !== appId));
+    setAdminActionToast(`Declined application for ${targetApp?.name || "Applicant"}.`);
+    setTimeout(() => setAdminActionToast(""), 4000);
+  };
+
   const handleApprove = (id) => {
     setVerifications((prev) => prev.filter((item) => item.id !== id));
+    adminService.reviewVerification(id, "verified");
   };
 
   const handleTagChange = (studentId, newTag) => {
@@ -137,6 +121,7 @@ export default function AdminDashboardPage() {
         return s;
       })
     );
+    adminService.updateRoleTag(studentId, newTag);
     const targetStudent = students.find((s) => s.id === studentId);
     setTagToast(`Updated ${targetStudent?.name || "Student"}'s tag to ${newTag}`);
     setTimeout(() => setTagToast(""), 3500);
@@ -165,27 +150,154 @@ export default function AdminDashboardPage() {
 
         <main className="flex-1 p-6 sm:p-8 max-w-7xl mx-auto w-full">
     
-          {/* KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {kpis.map(({ label, value, status, icon: Icon, color, bg }) => (
-              <div
-                key={label}
-                className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between"
+          {/* Toast / Notification Banners */}
+          {adminActionToast && (
+            <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm font-semibold flex items-center justify-between shadow-xs">
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
+                {adminActionToast}
+              </span>
+              <button
+                onClick={() => setAdminActionToast("")}
+                className="text-emerald-700 hover:text-emerald-900 text-xs font-bold"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    {label}
-                  </span>
-                  <div className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center`}>
-                    <Icon className="w-5 h-5" />
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          {/* KPI Cards */}
+          {(() => {
+            const kpiList = [
+              { label: "Registered Students", value: (overview.totalStudents ?? 0).toLocaleString(), status: "Live campus students", icon: Users, color: "text-[#4B9C93]", bg: "bg-[#E6F7F3]" },
+              { label: "Partner Companies", value: (overview.totalCompanies ?? 0).toLocaleString(), status: "Registered employers", icon: Building2, color: "text-blue-600", bg: "bg-blue-50" },
+              { label: "Active Internships", value: (overview.totalInternships ?? 0).toLocaleString(), status: "Open positions", icon: Briefcase, color: "text-purple-600", bg: "bg-purple-50" },
+              { label: "Applications Tracked", value: (overview.totalApplications ?? 0).toLocaleString(), status: "Total student submissions", icon: CheckCircle, color: "text-amber-600", bg: "bg-amber-50" },
+            ];
+
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {kpiList.map(({ label, value, status, icon: Icon, color, bg }) => (
+                  <div
+                    key={label}
+                    className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        {label}
+                      </span>
+                      <div className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-extrabold text-gray-900">{value}</div>
+                      <div className="text-xs text-emerald-600 font-medium mt-1">{status}</div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div className="text-3xl font-extrabold text-gray-900">{value}</div>
-                  <div className="text-xs text-emerald-600 font-medium mt-1">{status}</div>
-                </div>
+                ))}
               </div>
-            ))}
+            );
+          })()}
+
+          {/* ──── Admin Access Requests Review (Core Admin Authorization) ──── */}
+          <div className="bg-white rounded-3xl border border-gray-100 shadow-xs overflow-hidden mb-8">
+            <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-[#009689]" />
+                  <h3 className="text-lg font-bold text-gray-900">
+                    Admin Access Applications (Core Admin Review)
+                  </h3>
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Applicants request admin access with fixed official destination verification and consent. Accounts are only created after approval.
+                </p>
+              </div>
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200 self-start sm:self-auto">
+                {adminApplications.length} Pending Application{adminApplications.length === 1 ? "" : "s"}
+              </span>
+            </div>
+
+            {adminApplications.length === 0 ? (
+              <div className="p-8 text-center text-xs text-gray-400">
+                No pending admin access applications to review.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-gray-600">
+                  <thead className="bg-[#F9FAFB] text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                    <tr>
+                      <th className="py-3.5 px-6">Applicant</th>
+                      <th className="py-3.5 px-6">DOB & Contact</th>
+                      <th className="py-3.5 px-6">Recommender</th>
+                      <th className="py-3.5 px-6">Photo Consent</th>
+                      <th className="py-3.5 px-6">Applicant Note</th>
+                      <th className="py-3.5 px-6 text-right">Core Admin Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {adminApplications.map((app) => (
+                      <tr key={app.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={app.photoUrl}
+                              alt={app.name}
+                              className="w-10 h-10 rounded-full object-cover border border-[#009689]"
+                            />
+                            <div>
+                              <div className="font-bold text-gray-900 text-sm">
+                                {app.name}
+                              </div>
+                              <div className="text-xs text-gray-500 font-mono">
+                                {app.email}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 text-xs text-gray-600">
+                          <div>DOB: <span className="font-semibold text-gray-800">{app.dob}</span></div>
+                          <div className="text-gray-500">{app.phone}</div>
+                        </td>
+                        <td className="py-4 px-6 text-xs font-medium text-gray-800">
+                          {app.recommendedBy}
+                        </td>
+                        <td className="py-4 px-6">
+                          {app.photoConsent ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                              <CheckCircle className="w-3 h-3 text-emerald-600" />
+                              Public Icon Consent Given
+                            </span>
+                          ) : (
+                            <span className="text-xs text-red-600 font-bold">
+                              No Consent
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-xs text-gray-500 max-w-[200px] truncate" title={app.notes}>
+                          {app.notes || <span className="italic text-gray-400">No notes provided</span>}
+                        </td>
+                        <td className="py-4 px-6 text-right space-x-2 whitespace-nowrap">
+                          <button
+                            onClick={() => handleApproveAdminApp(app.id)}
+                            className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#009689] text-white hover:bg-[#007e73] transition-colors cursor-pointer shadow-2xs"
+                          >
+                            Approve Admin
+                          </button>
+                          <button
+                            onClick={() => handleRejectAdminApp(app.id)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors cursor-pointer"
+                          >
+                            Reject
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           {/* Verification & Moderation Queue */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Briefcase,
@@ -13,70 +13,54 @@ import {
   Eye,
   Search,
   Filter,
-  Sparkles,
 } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
-
-const stats = [
-  { label: "Active Postings", value: "6", change: "+2 this month", icon: Briefcase, color: "text-[#4B9C93]", bg: "bg-[#E6F7F3]" },
-  { label: "Total Applicants", value: "184", change: "+34 new today", icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-  { label: "Under Review", value: "42", change: "18 pending review", icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
-  { label: "Interviews Scheduled", value: "14", change: "4 this week", icon: Calendar, color: "text-purple-600", bg: "bg-purple-50" },
-];
-
-const mockRecentApplicants = [
-  {
-    id: 1,
-    name: "Joel A. Jacob",
-    role: "Frontend Developer Intern",
-    college: "College of Engineering Trivandrum",
-    score: 93,
-    status: "Shortlisted",
-    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    skills: ["React", "Next.js", "Tailwind CSS"],
-    appliedDate: "Oct 19, 2026",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/5a82e47de052e6b1e8a0daf000f4c7f2631701fe?width=180",
-  },
-  {
-    id: 2,
-    name: "S SIDHARTH",
-    role: "UI/UX Product Design Intern",
-    college: "College of Engineering Trivandrum",
-    score: 96,
-    status: "Interview Scheduled",
-    statusColor: "bg-purple-50 text-purple-700 border-purple-200",
-    skills: ["Figma", "Design Systems", "User Research"],
-    appliedDate: "Oct 18, 2026",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/ab8e554398afb86403d2a7da0c420fe67c60f085?width=180",
-  },
-  {
-    id: 3,
-    name: "Ananya Sharma",
-    role: "Machine Learning Research Intern",
-    college: "IIT Madras",
-    score: 89,
-    status: "Reviewing",
-    statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-    skills: ["PyTorch", "Python", "Data Analytics"],
-    appliedDate: "Oct 18, 2026",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=180&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 4,
-    name: "Rahul Verma",
-    role: "Full Stack Engineering Intern",
-    college: "BITS Pilani",
-    score: 91,
-    status: "Applied",
-    statusColor: "bg-blue-50 text-blue-700 border-blue-200",
-    skills: ["Node.js", "PostgreSQL", "React"],
-    appliedDate: "Oct 17, 2026",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&auto=format&fit=crop&q=80",
-  },
-];
+import { applicationService, internshipService } from "@/services/apiClient";
 
 export default function CompanyDashboardPage() {
+  const [recentApplicants, setRecentApplicants] = useState([]);
+  const [activePostingsCount, setActivePostingsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+
+    internshipService.list({}).then((res) => {
+      if (isMounted && res && Array.isArray(res)) {
+        setActivePostingsCount(res.length);
+      }
+    }).catch(() => {});
+
+    applicationService.getCompanyApplications({}).then((res) => {
+      if (isMounted && res && Array.isArray(res)) {
+        const mapped = res.map((app) => ({
+          id: app._id || app.id,
+          name: app.candidate?.name || app.candidateName || "Candidate",
+          role: app.internship?.role || app.internship?.title || "Internship Opening",
+          college: app.candidate?.college || "",
+          score: app.score ?? app.candidate?.reputationScore ?? 0,
+          status: app.status ? (app.status.charAt(0).toUpperCase() + app.status.slice(1).toLowerCase()) : "Applied",
+          statusColor: app.status === "Shortlisted" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                       app.status === "Interviewing" ? "bg-purple-50 text-purple-700 border-purple-200" :
+                       app.status === "Reviewing" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                       "bg-blue-50 text-blue-700 border-blue-200",
+          skills: app.candidate?.primarySkills || (app.candidate?.skills ? app.candidate.skills.map(s => typeof s === "string" ? s : s.name) : []),
+          appliedDate: app.createdAt ? new Date(app.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Recently",
+          avatar: app.candidate?.profileIcon || `https://ui-avatars.com/api/?name=${encodeURIComponent(app.candidate?.name || "Candidate")}&background=4B9C93&color=fff&size=180`,
+        }));
+        setRecentApplicants(mapped);
+      }
+      setLoading(false);
+    }).catch(() => {
+      if (isMounted) setLoading(false);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#F7F9F9] flex">
       <DashboardSidebar />
@@ -89,7 +73,7 @@ export default function CompanyDashboardPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 bg-gradient-to-r from-[#4B9C93] to-[#367971] text-white p-6 sm:p-8 rounded-3xl shadow-sm">
             <div>
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-xs px-3 py-1 rounded-full text-xs font-semibold mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-amber-300" />
                 <span>Hiring Season 2026 Active</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
@@ -111,27 +95,40 @@ export default function CompanyDashboardPage() {
           </div>
 
           {/* Metric Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {stats.map(({ label, value, change, icon: Icon, color, bg }) => (
-              <div
-                key={label}
-                className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    {label}
-                  </span>
-                  <div className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center`}>
-                    <Icon className="w-5 h-5" />
+          {(() => {
+            const underReviewCount = recentApplicants.filter((a) => a.status === "Reviewing" || a.status === "Applied").length;
+            const interviewingCount = recentApplicants.filter((a) => a.status === "Interviewing").length;
+            const dynamicStats = [
+              { label: "Active Postings", value: activePostingsCount.toString(), change: "Open opportunities", icon: Briefcase, color: "text-[#4B9C93]", bg: "bg-[#E6F7F3]" },
+              { label: "Total Applicants", value: recentApplicants.length.toString(), change: "Direct submissions", icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+              { label: "Under Review", value: underReviewCount.toString(), change: "Pending evaluation", icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
+              { label: "Interviews Scheduled", value: interviewingCount.toString(), change: "Candidate discussions", icon: Calendar, color: "text-purple-600", bg: "bg-purple-50" },
+            ];
+
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {dynamicStats.map(({ label, value, change, icon: Icon, color, bg }) => (
+                  <div
+                    key={label}
+                    className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        {label}
+                      </span>
+                      <div className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-extrabold text-gray-900">{value}</div>
+                      <div className="text-xs text-gray-400 mt-1">{change}</div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div className="text-3xl font-extrabold text-gray-900">{value}</div>
-                  <div className="text-xs text-gray-400 mt-1">{change}</div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          })()}
 
           {/* Recent Candidate Applications */}
           <div className="bg-white rounded-3xl border border-gray-100 shadow-xs overflow-hidden">
@@ -149,7 +146,7 @@ export default function CompanyDashboardPage() {
                   href="/company/applications"
                   className="inline-flex items-center gap-1 text-xs font-semibold text-[#4B9C93] hover:text-[#3d867e] transition-colors"
                 >
-                  <span>View All Applications ({mockRecentApplicants.length})</span>
+                  <span>View All Applications ({recentApplicants.length})</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -168,7 +165,7 @@ export default function CompanyDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {mockRecentApplicants.map((candidate) => (
+                  {recentApplicants.map((candidate) => (
                     <tr key={candidate.id} className="hover:bg-slate-50/70 transition-colors">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">

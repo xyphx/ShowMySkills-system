@@ -15,8 +15,10 @@ import {
   FileText,
   CheckCircle,
   BarChart3,
-  Sparkles,
   X,
+  GraduationCap,
+  Building2,
+  Award,
 } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 
@@ -33,6 +35,8 @@ export default function DashboardSidebar() {
     ? "company"
     : pathname.startsWith("/admin")
     ? "admin"
+    : pathname.startsWith("/college")
+    ? "college"
     : pathname.startsWith("/student")
     ? "student"
     : "guest";
@@ -59,7 +63,20 @@ export default function DashboardSidebar() {
       { label: "Chats", href: "/company/chats", icon: MessageSquare },
     ];
     bottomNavItems = [
-      { label: "Company Profile", href: "/company/profile", icon: User },
+      { label: "Company Profile", href: "/company/profile", icon: Building2 },
+      { label: "About Us", href: "/about", icon: Info },
+      { label: "Settings", href: "/settings", icon: Settings },
+      { label: "Help & Support", href: "/help", icon: HelpCircle },
+    ];
+  } else if (role === "college") {
+    topNavItems = [
+      { label: "Dashboard", href: "/college/dashboard", icon: LayoutDashboard },
+      { label: "Students", href: "/college/students", icon: GraduationCap },
+      { label: "Internships", href: "/internships", icon: Briefcase },
+      { label: "Chats", href: "/student/chats", icon: MessageSquare },
+    ];
+    bottomNavItems = [
+      { label: "College Profile", href: "/college/profile", icon: Building2 },
       { label: "About Us", href: "/about", icon: Info },
       { label: "Settings", href: "/settings", icon: Settings },
       { label: "Help & Support", href: "/help", icon: HelpCircle },
@@ -80,6 +97,7 @@ export default function DashboardSidebar() {
     // Default: Student Portal
     topNavItems = [
       { label: "Internships", href: "/student/internships", icon: Briefcase },
+      { label: "Applications", href: "/student/applications", icon: FileText },
       { label: "People", href: "/student/people", icon: Users },
       { label: "Chats", href: "/student/chats", icon: MessageSquare },
       { label: "Launchpad", href: "/student/launchpad", icon: Rocket },
@@ -228,6 +246,26 @@ export default function DashboardSidebar() {
                 className="block w-full py-1.5 rounded-full bg-[#4B9C93] text-white text-[11px] font-semibold hover:bg-[#3d867e] transition-colors cursor-pointer text-center"
               >
                 Post Internship
+              </Link>
+            </div>
+          ) : role === "college" ? (
+            <div className="my-2 bg-white rounded-xl p-3 shadow-md shadow-black/5 text-center">
+              <div className="h-6 w-6 rounded-full bg-[#4B9C93]/10 flex items-center justify-center mx-auto mb-1">
+                <GraduationCap className="w-3.5 h-3.5 text-[#4B9C93]" />
+              </div>
+              <h4 className="text-xs font-bold text-gray-900 mb-0.5">
+                Placement Cell
+              </h4>
+              <p className="text-[10px] text-gray-500 leading-tight mb-2">
+                Track student placements and verified credentials
+              </p>
+              <Link
+                href="/college/students"
+                onClick={closeSidebar}
+                id="sidebar-college-students-btn"
+                className="block w-full py-1.5 rounded-full bg-[#4B9C93] text-white text-[11px] font-semibold hover:bg-[#3d867e] transition-colors cursor-pointer text-center"
+              >
+                View Students
               </Link>
             </div>
           ) : role === "admin" ? (

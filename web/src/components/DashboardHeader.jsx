@@ -18,37 +18,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
-
-const mockNotifications = [
-  {
-    id: 1,
-    title: "Profile Viewed",
-    desc: "Visa early careers recruiting team viewed your ShowMySkills portfolio.",
-    time: "10m ago",
-    unread: true,
-  },
-  {
-    id: 2,
-    title: "Application Shortlisted",
-    desc: "Atlassian shortlisted your application for Software Engineering Intern 2025.",
-    time: "2h ago",
-    unread: true,
-  },
-  {
-    id: 3,
-    title: "Skill Verified",
-    desc: "React & Next.js Architecture skill assessment passed with score 93%.",
-    time: "1d ago",
-    unread: false,
-  },
-  {
-    id: 4,
-    title: "New Message",
-    desc: "Joel A. Jacob sent you a message in Chats.",
-    time: "2d ago",
-    unread: false,
-  },
-];
+import { notificationService, authService } from "@/services/apiClient";
 
 export default function DashboardHeader({
   title,
@@ -59,8 +29,33 @@ export default function DashboardHeader({
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState([]);
   const [planToast, setPlanToast] = useState("");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("user");
+        if (stored) setUser(JSON.parse(stored));
+      } catch {}
+    }
+    authService.getCurrentUser().then((res) => {
+      if (isMounted && res) {
+        setUser(res);
+      }
+    }).catch(() => {});
+
+    notificationService.list().then((res) => {
+      if (isMounted && res && Array.isArray(res)) {
+        setNotifications(res);
+      }
+    }).catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handlePlanClick = () => {
     setPlanToast("currently not avalable");
@@ -88,6 +83,7 @@ export default function DashboardHeader({
 
   const handleMarkAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    notificationService.markRead();
   };
 
   const role = pathname.startsWith("/company")
@@ -103,10 +99,12 @@ export default function DashboardHeader({
     (role === "guest"
       ? "Explore Opportunities"
       : role === "company"
-      ? "Welcome back, Partner Company"
+      ? (user?.companyProfile?.companyName ? `Welcome back, ${user.companyProfile.companyName}` : (user?.name ? `Welcome back, ${user.name}` : "Welcome back"))
       : role === "admin"
       ? "Admin Command Center"
-      : "Welcome back, CBIT");
+      : role === "college"
+      ? (user?.collegeProfile?.collegeName ? `Welcome back, ${user.collegeProfile.collegeName}` : (user?.name ? `Welcome back, ${user.name}` : "Welcome back"))
+      : (user?.name ? `Welcome back, ${user.name}` : "Welcome back"));
 
   const displaySubtitle =
     subtitle !== undefined
@@ -122,7 +120,7 @@ export default function DashboardHeader({
   return (
     <header
       id="dashboard-header"
-      className="sticky top-0 z-30 px-4 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between border-b border-gray-100 bg-[#F7F9F9]/85 backdrop-blur-md"
+      className="sticky top-0 z-30 px-4 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between border-b border-gray-100 bg-[#F7F9F9]/85 backdrop-blur-md shrink-0"
     >
       {/* ──── Left: Hamburger Button + Greeting ──── */}
       <div className="flex items-center gap-2.5 sm:gap-3">
@@ -137,7 +135,7 @@ export default function DashboardHeader({
         </button>
 
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-base sm:text-xl font-bold text-gray-900 leading-tight">
             {displayTitle}
           </h1>
           {displaySubtitle && (
@@ -340,7 +338,7 @@ export default function DashboardHeader({
                 aria-label="User Profile Menu"
                 className="w-9 h-9 rounded-full bg-[#4B9C93] text-white flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-[#4B9C93]/30 transition-all shadow-xs"
               >
-                B
+                {user?.name ? user.name.charAt(0).toUpperCase() : (role === "admin" ? "A" : role === "company" ? "C" : role === "college" ? "U" : "S")}
               </button>
 
               {/* Profile Dropdown Menu */}
@@ -348,8 +346,12 @@ export default function DashboardHeader({
                 <div className="absolute right-0 top-11 w-60 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50">
                   {/* User Info Header */}
                   <div className="p-3 bg-gray-50 rounded-xl mb-1.5">
-                    <div className="font-bold text-xs text-gray-900">CBIT Student</div>
-                    <div className="text-[11px] text-gray-500 truncate">student@cbit.ac.in</div>
+                    <div className="font-bold text-xs text-gray-900 truncate">
+                      {user?.name || (role === "admin" ? "Admin User" : role === "company" ? "Company Account" : role === "college" ? "College Account" : "Student Profile")}
+                    </div>
+                    <div className="text-[11px] text-gray-500 truncate">
+                      {user?.email || "Account Active"}
+                    </div>
                     <button
                       type="button"
                       onClick={() => {

@@ -110,11 +110,11 @@ export default function RoleSelection({ onSelectRole }) {
           {/* Terms Footer */}
           <div className="text-center mt-8 text-[11px] sm:text-xs text-gray-500">
             By continuing, you agree to our{" "}
-            <a href="#terms" className="text-sky-600 hover:underline font-medium">
+            <a href="/terms" className="text-sky-600 hover:underline font-medium">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#privacy" className="text-sky-600 hover:underline font-medium">
+            <a href="/privacy" className="text-sky-600 hover:underline font-medium">
               Privacy Policy
             </a>
             .

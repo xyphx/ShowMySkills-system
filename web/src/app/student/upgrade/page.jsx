@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Rocket, Sparkles, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Rocket, CheckCircle2, ShieldCheck } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 

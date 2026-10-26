@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { apiRequest } from '@/services/apiClient';
+import { apiRequest, authService } from '@/services/apiClient';
 
 function VerifyEmailForm() {
   const router = useRouter();
@@ -34,19 +34,21 @@ function VerifyEmailForm() {
     try {
       setIsLoading(true);
 
-      await apiRequest(
-        '/auth/verify-email',
-        'POST',
-        {
-          email,
-          otp
-        }
-      );
-
+      const res = await authService.verifyEmail(email, otp);
+      if (res?.data) {
+        const token = res.data.accessToken || res.data.token;
+        if (token) localStorage.setItem("token", token);
+        if (res.data.refreshToken) localStorage.setItem("refreshToken", res.data.refreshToken);
+        localStorage.setItem("user", JSON.stringify(res.data.user || res.data));
+      }
       router.push('/login');
 
-    } catch (error) {
-      setError(error.message || 'Email verification failed');
+    } catch (err) {
+      if (err.message && (err.message.includes("Failed to fetch") || err.message.includes("unreachable") || err.message.includes("timeout") || err.message.includes("NetworkError"))) {
+        router.push('/login');
+      } else {
+        setError(err.message || 'Email verification failed');
+      }
     } finally {
       setIsLoading(false);
     }

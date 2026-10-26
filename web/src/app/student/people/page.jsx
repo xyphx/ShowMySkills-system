@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -14,7 +14,6 @@ import {
   X,
   ExternalLink,
   GraduationCap,
-  Sparkles,
   CheckCircle2,
   Share2,
   MessageSquare,
@@ -23,156 +22,11 @@ import {
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import StudentRoleTag, { STUDENT_ROLE_TAGS } from "@/components/StudentRoleTag";
-
-// Candidate mock data directly from Figma frame "Student discovery"
-const initialCandidates = [
-  {
-    id: 1,
-    name: "Joel A. Jacob",
-    tag: "Maintainer",
-    role: "Frontend Developer",
-    college: "College of Engineering Trivandrum",
-    department: "Computer Science (AI & Machine Learning)",
-    location: "Punalur, Kollam, Kerala, India",
-    score: 23,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/5a82e47de052e6b1e8a0daf000f4c7f2631701fe?width=180",
-    skills: ["App Development", "Communication"],
-    allSkills: ["App Development", "Communication", "React", "Next.js", "Tailwind CSS", "TypeScript"],
-    bio: "Passionate frontend engineer focused on building intuitive, high-performance web and mobile applications with modern JavaScript frameworks.",
-    projects: [
-      { name: "CampusHub Mobile", desc: "Flutter & Firebase app for campus events and peer networking." },
-      { name: "ShowMySkills Web Client", desc: "High-performance student portfolio showcase system." },
-    ],
-  },
-  {
-    id: 2,
-    name: "S SIDHARTH",
-    tag: "Admin",
-    role: "UI/UX Designer",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    location: "Trivandrum, Kerala",
-    score: 63,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/ab8e554398afb86403d2a7da0c420fe67c60f085?width=180",
-    skills: ["Machine Learning / AI", "Operating Systems"],
-    allSkills: ["Machine Learning / AI", "Operating Systems", "UI/UX Design", "Figma", "Design Systems"],
-    bio: "Product designer and engineer who blends human-centered design with computational engineering to build seamless digital experiences.",
-    projects: [
-      { name: "FinFlow Analytics Dashboard", desc: "Design system and interface for enterprise financial metrics." },
-      { name: "EcoTrack Mobility", desc: "UX research and high-fidelity prototype for sustainable transit." },
-    ],
-  },
-  {
-    id: 3,
-    name: "Reshma Udhayan",
-    tag: "Promoter",
-    role: "FullStack Developer",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial engineering",
-    location: "Trivandrum",
-    score: 72,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/c3059191c12486377929540d913e78b03ba9bddc?width=180",
-    skills: ["SolidWorks", "CAD / CAM / CAE"],
-    allSkills: ["SolidWorks", "CAD / CAM / CAE", "Node.js", "React", "PostgreSQL", "FullStack Web"],
-    bio: "Full-stack developer with a strong mechanical & systems design background, engineering scalable web platforms and 3D modeling tools.",
-    projects: [
-      { name: "AutoCAD Cloud Sync", desc: "Web platform connecting CAD rendering pipelines with real-time feedback." },
-      { name: "TalentLink Portal", desc: "Full-stack recruiting platform with automated resume parsing." },
-    ],
-  },
-  {
-    id: 4,
-    name: "Vaishnav RL",
-    tag: "Ambassador",
-    role: "Graphic Designer",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    location: "Trivandrum",
-    score: 81,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/46fce00ed55aca498d8347d953abdc65e3ba2655?width=180",
-    skills: ["UI/ UX", "Financial analysis"],
-    allSkills: ["UI/ UX", "Financial analysis", "Brand Identity", "Motion Graphics", "Figma"],
-    bio: "Visual and brand designer translating quantitative business insights and financial narratives into compelling graphics.",
-    projects: [
-      { name: "Venture Metrics Annual Report", desc: "Visual storytelling and data visualization branding package." },
-      { name: "Aura Brand Identity", desc: "Complete visual identity and design tokens for tech startups." },
-    ],
-  },
-  {
-    id: 5,
-    name: "Abhay SA",
-    tag: "Contributor",
-    role: "FullStack Developer",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial engineering",
-    location: "Trivandrum",
-    score: 72,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/f7559f012fcf86117c87ef912259ea3d4b2467c5?width=180",
-    skills: ["SolidWorks", "CAD / CAM / CAE"],
-    allSkills: ["SolidWorks", "CAD / CAM / CAE", "Next.js", "Express", "Docker", "REST APIs"],
-    bio: "Full-stack engineer passionate about industrial automation, backend architectures, and developer tooling.",
-    projects: [
-      { name: "Smart Inventory Orchestrator", desc: "Real-time warehouse tracking platform with IoT integration." },
-      { name: "RapidCAD Web Viewer", desc: "Browser-based lightweight 3D CAD inspector." },
-    ],
-  },
-  {
-    id: 6,
-    name: "Rishi Chandran",
-    tag: "Ambassador",
-    role: "Graphic Designer",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    location: "Trivandrum",
-    score: 81,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/ffe52c79545b2a85e56e27f28c8198d4551e8795?width=180",
-    skills: ["UI/ UX", "Financial analysis"],
-    allSkills: ["UI/ UX", "Financial analysis", "Typography", "Illustrator", "Product Strategy"],
-    bio: "Multidisciplinary visual designer focused on marketing design, clean interface aesthetics, and conversion-focused landing pages.",
-    projects: [
-      { name: "Apex Design System", desc: "Modular design kit for fintech and data-heavy applications." },
-      { name: "Kerala Startup Mission Deck", desc: "Pitch deck visual storytelling winning state-level innovation grant." },
-    ],
-  },
-  {
-    id: 7,
-    name: "asher john",
-    tag: "Promoter",
-    role: "Frontend Developer",
-    college: "College of Engineering Trivandrum",
-    department: "Computer Science (AI & Machine Learning)",
-    location: "Punalur, Kollam, Kerala, India",
-    score: 23,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/c108ffdec7504150607ccddcecf48749b1c50f54?width=180",
-    skills: ["App Development", "Communication"],
-    allSkills: ["App Development", "Communication", "React Native", "Vue.js", "GraphQL"],
-    bio: "Frontend engineer enthusiastic about AI-augmented applications, accessibility, and high framerate mobile interfaces.",
-    projects: [
-      { name: "VoiceLearn AI", desc: "Interactive language tutor with low-latency speech recognition." },
-      { name: "PulseUI", desc: "Component library designed for rapid hackathon prototyping." },
-    ],
-  },
-  {
-    id: 8,
-    name: "Devikripa S",
-    tag: "Contributor",
-    role: "UI/UX Designer",
-    college: "College of Engineering Trivandrum",
-    department: "Industrial Engineering",
-    location: "Trivandrum, Kerala",
-    score: 63,
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/a5bb5f84222369dfc64ce1f696c04fdc36d5fa89?width=180",
-    skills: ["Machine Learning / AI", "Operating Systems"],
-    allSkills: ["Machine Learning / AI", "Operating Systems", "User Research", "Wireframing", "Figma"],
-    bio: "User experience designer who combines user research with behavioral psychology to design high-engagement digital products.",
-    projects: [
-      { name: "SkillVerify Student Dashboard", desc: "End-to-end UX architecture for peer-verified technical competencies." },
-      { name: "HealthTrack Patient Flow", desc: "Mobile telemedicine interface streamlined for elderly usability." },
-    ],
-  },
-];
+import { peopleService, apiRequest } from "@/services/apiClient";
 
 export default function StudentPeoplePage() {
+  const [candidates, setCandidates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [minScore, setMinScore] = useState(0);
@@ -181,6 +35,44 @@ export default function StudentPeoplePage() {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Fetch real users from MongoDB via Express API
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    peopleService.list({ role: "student" }).then((data) => {
+      if (!isMounted) return;
+      if (Array.isArray(data)) {
+        const formatted = data.map((u, i) => {
+          const rawSkills = u.primarySkills && u.primarySkills.length > 0
+            ? u.primarySkills
+            : (u.skills ? u.skills.map((s) => (typeof s === "string" ? s : s.name)) : []);
+          return {
+            id: u._id || u.id || i + 1,
+            name: u.name,
+            tag: u.roleTag || "Student",
+            role: u.headline || "Student Developer",
+            college: u.college || "",
+            department: u.branch || u.course || "",
+            location: u.location || "",
+            score: u.reputationScore ?? u.score ?? 0,
+            avatar: u.profileIcon || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || "Student")}&background=4B9C93&color=fff&size=180`,
+            skills: rawSkills.slice(0, 2),
+            allSkills: rawSkills,
+            bio: u.bio || "",
+            projects: u.projects || [],
+          };
+        });
+        setCandidates(formatted);
+      }
+      setLoading(false);
+    }).catch(() => {
+      if (isMounted) setLoading(false);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -199,11 +91,14 @@ export default function StudentPeoplePage() {
       }
       return next;
     });
+
+    // Fire API call asynchronously
+    apiRequest(`/bookmarks/candidates/${id}`, "POST").catch(() => {});
   };
 
   // Filter candidates based on search & filters
   const filteredCandidates = useMemo(() => {
-    return initialCandidates.filter((c) => {
+    return candidates.filter((c) => {
       // Role filter
       if (selectedRole !== "all" && c.role.toLowerCase() !== selectedRole.toLowerCase()) {
         return false;
@@ -226,13 +121,13 @@ export default function StudentPeoplePage() {
         c.score.toString().includes(q)
       );
     });
-  }, [searchQuery, selectedRole, minScore]);
+  }, [candidates, searchQuery, selectedRole, minScore]);
 
   // Unique roles for filter dropdown
   const uniqueRoles = useMemo(() => {
-    const roles = new Set(initialCandidates.map((c) => c.role));
+    const roles = new Set(candidates.map((c) => c.role));
     return Array.from(roles);
-  }, []);
+  }, [candidates]);
 
   return (
     <div className="min-h-screen bg-[#F7F9F9] flex">
@@ -243,8 +138,8 @@ export default function StudentPeoplePage() {
       <div className="flex-1 md:ml-[220px] ml-0 flex flex-col min-h-screen relative pb-12">
         {/* Top Header */}
         <DashboardHeader
-          title="Welcome back, CBIT"
-          subtitle="Here's how your profile is performing this week"
+          title="Community & Innovators"
+          subtitle="Discover verified student engineers, contributors, and campus peers"
         />
 
         {/* Toast notification */}
@@ -412,7 +307,29 @@ export default function StudentPeoplePage() {
           )}
 
           {/* ──── Talent Grid ──── */}
-          {filteredCandidates.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 lg:gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sk) => (
+                <div
+                  key={sk}
+                  className="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-6 flex flex-col justify-between animate-pulse"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-[84px] h-[84px] sm:w-[90px] sm:h-[90px] rounded-lg bg-slate-200 shrink-0" />
+                    <div className="flex-1 space-y-2.5">
+                      <div className="h-5 bg-slate-200 rounded w-1/2" />
+                      <div className="h-3.5 bg-slate-100 rounded w-1/3" />
+                      <div className="h-3.5 bg-slate-100 rounded w-2/3" />
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <div className="h-6 bg-slate-100 rounded w-1/3" />
+                    <div className="h-7 bg-slate-200 rounded w-24" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredCandidates.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center my-8 max-w-xl mx-auto shadow-xs">
               <div className="w-16 h-16 rounded-full bg-[#E6F7F3] text-[#4B9C93] flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8" />
@@ -705,9 +622,8 @@ export default function StudentPeoplePage() {
                   {selectedCandidate.allSkills.map((s) => (
                     <span
                       key={s}
-                      className="px-3 py-1 bg-[#F8FAFC] border border-gray-200 rounded-full text-xs font-medium text-gray-700 flex items-center gap-1.5"
+                      className="px-3 py-1 bg-[#F8FAFC] border border-gray-200 rounded-full text-xs font-medium text-gray-700"
                     >
-                      <Sparkles className="w-3 h-3 text-[#4B9C93]" />
                       {s}
                     </span>
                   ))}

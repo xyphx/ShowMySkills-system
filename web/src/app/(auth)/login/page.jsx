@@ -3,13 +3,12 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { authService } from "@/services/apiClient";
 
 const roleConfigs = {
   student: {
     title: "Student  Log In",
     tagline: "Show your skills. Discover your\nopportunities.",
-    nameLabel: "Full Name",
-    namePlaceholder: "e.g. Asma Naureen",
     emailLabel: "Email Address",
     emailPlaceholder: "you@university.edu",
     illustration: "/SignIn/StudentLogin.png",
@@ -18,18 +17,22 @@ const roleConfigs = {
   company: {
     title: "Company Log In",
     tagline: "Find the talent that brings your\nnext big idea to life.",
-    nameLabel: "Company Name",
-    namePlaceholder: "e.g. xphy company",
     emailLabel: "Office Email Address",
-    emailPlaceholder: "you@company.com",
+    emailPlaceholder: "hello@xyzcompany.com",
     illustration: "/SignIn/CompanyLogin.png",
     dashboardRoute: "/company/dashboard",
+  },
+  college: {
+    title: "College Log In",
+    tagline: "Improve placement outcomes and manage\nstudent talent with showmyskills.",
+    emailLabel: "College Email Address",
+    emailPlaceholder: "admin@college.edu",
+    illustration: "/SignIn/CompanyLogin.png",
+    dashboardRoute: "/college/dashboard",
   },
   admin: {
     title: "Admin Log In",
     tagline: "Manage and monitor platform\noutcomes with showmyskills",
-    nameLabel: "Admin Name",
-    namePlaceholder: "e.g. System Administrator",
     emailLabel: "Admin Email Address",
     emailPlaceholder: "admin@showmyskills.com",
     illustration: "/SignIn/AdminLogin.png",
@@ -45,7 +48,6 @@ function LoginFormContent() {
   const [activeRole, setActiveRole] = useState(
     roleConfigs[initialRole] ? initialRole : "student"
   );
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -53,15 +55,32 @@ function LoginFormContent() {
 
   const config = roleConfigs[activeRole];
 
-  const handleLogin = (e) => {
+  const handleRoleChange = (role) => {
+    setActiveRole(role);
+    setError("");
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    try {
+      const res = await authService.login(normalizedEmail, password, activeRole);
+      if (res?.data) {
+        const token = res.data.accessToken || res.data.token;
+        if (token) localStorage.setItem("token", token);
+        if (res.data.refreshToken) localStorage.setItem("refreshToken", res.data.refreshToken);
+        localStorage.setItem("user", JSON.stringify(res.data.user || res.data));
+      }
       setLoading(false);
       router.push(config.dashboardRoute);
-    }, 600);
+    } catch (err) {
+      setError(err.message || "Failed to log in. Please check your credentials.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -114,7 +133,7 @@ function LoginFormContent() {
           <div className="flex items-center bg-gray-100/80 p-1 rounded-full text-xs font-semibold">
             <button
               type="button"
-              onClick={() => setActiveRole("student")}
+              onClick={() => handleRoleChange("student")}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
                 activeRole === "student"
                   ? "bg-[#4B9C93] text-white shadow-xs font-bold"
@@ -125,7 +144,7 @@ function LoginFormContent() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveRole("company")}
+              onClick={() => handleRoleChange("company")}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
                 activeRole === "company"
                   ? "bg-[#4B9C93] text-white shadow-xs font-bold"
@@ -136,7 +155,7 @@ function LoginFormContent() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveRole("admin")}
+              onClick={() => handleRoleChange("admin")}
               className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
                 activeRole === "admin"
                   ? "bg-[#4B9C93] text-white shadow-xs font-bold"
@@ -149,7 +168,7 @@ function LoginFormContent() {
         </div>
 
         {/* Card Title & Subtitle */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-4">
           <h2 className="text-3xl sm:text-[32px] font-bold text-gray-900">
             Log In
           </h2>
@@ -158,35 +177,10 @@ function LoginFormContent() {
           </p>
         </div>
 
+
+
         {/* Form Inputs Grid */}
         <form onSubmit={handleLogin} className="space-y-4">
-          {/* Field 1: Name */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-[#1F2937]">
-              {config.nameLabel}
-            </label>
-            <div className="flex items-center h-[44px] px-3.5 rounded-lg border border-[#DADADA] bg-[#F9FAFB] focus-within:border-[#4B9C93] focus-within:bg-white transition-all">
-              {activeRole === "student" ? (
-                <svg className="w-4 h-4 text-[#4A5565] shrink-0 opacity-80" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12.6672 14V12.6667C12.6672 11.9594 12.3862 11.2811 11.886 10.781C11.3859 10.281 10.7075 10 10.0002 10H5.99974C5.29241 10 4.61406 10.281 4.1139 10.781C3.61375 11.2811 3.33276 11.9594 3.33276 12.6667V14M10.6669 4.66667C10.6669 6.13943 9.47289 7.33333 7.99996 7.33333C6.52704 7.33333 5.33299 6.13943 5.33299 4.66667C5.33299 3.19391 6.52704 2 7.99996 2C9.47289 2 10.6669 3.19391 10.6669 4.66667Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4 text-[#4A5565] shrink-0 opacity-80" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 14V4H6V14H2Z" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="M10 14V4H14V14H10Z" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="M6 14V2H10V14H6Z" stroke="currentColor" strokeWidth="1.8" />
-                </svg>
-              )}
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder={config.namePlaceholder}
-                className="w-full bg-transparent pl-2.5 text-sm text-[#1F2937] placeholder:text-[#4A5565]/80 focus:outline-none"
-              />
-            </div>
-          </div>
 
           {/* Field 2: Email */}
           <div className="space-y-1.5">
@@ -228,12 +222,12 @@ function LoginFormContent() {
             </div>
             {/* Forgot Password Link */}
             <div className="flex justify-end pt-1">
-              <button
-                type="button"
+              <Link
+                href="/forgot-password"
                 className="text-xs sm:text-sm font-medium text-[#A10C00] hover:underline cursor-pointer"
               >
                 Forgot Password?
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -252,34 +246,39 @@ function LoginFormContent() {
           </div>
         </form>
 
-        {/* Divider */}
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#D1D5DC]" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-3 text-[#6A7282] font-normal">
-              Or continue with
-            </span>
-          </div>
-        </div>
+        {/* Google SSO Button — Enabled for Student and Company, removed for Admin */}
+        {activeRole !== "admin" && (
+          <>
+            {/* Divider */}
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[#D1D5DC]" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-white px-3 text-[#6A7282] font-normal">
+                  Or continue with
+                </span>
+              </div>
+            </div>
 
-        {/* Google SSO Button */}
-        <button
-          type="button"
-          onClick={() => router.push(config.dashboardRoute)}
-          className="w-full h-[48px] rounded-xl border border-[#D1D5DC] bg-white hover:bg-gray-50 flex items-center justify-center gap-2.5 transition-colors cursor-pointer shadow-2xs"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9.99993 3.95833C11.4749 3.95833 12.6499 4.47083 13.4541 4.9L16.0291 2.325C14.5333 0.8875 12.4208 0 9.99993 0C6.09993 0 2.6666 2.35 1.0166 5.77917L4.18743 8.24583C5.0541 5.47083 7.3166 3.95833 9.99993 3.95833Z" fill="#4285F4" />
-            <path d="M19.2083 10.2084C19.2083 9.52508 19.1458 8.86675 19.025 8.22925H10V11.9792H15.1833C14.9583 13.1334 14.275 14.1126 13.2458 14.7709L16.2583 17.1126C18.325 15.4709 19.2083 13.0542 19.2083 10.2084Z" fill="#34A853" />
-            <path d="M4.1875 11.9958C3.71667 10.5917 3.71667 8.99168 4.1875 7.58752L1.01667 5.12085C0.358333 7.02918 0 8.57085 0 10.2083C0 11.8458 0.358333 13.3875 1.01667 14.8792L4.1875 12.4125V11.9958Z" fill="#FBBC05" />
-            <path d="M9.99993 19.9999C12.6999 19.9999 14.9708 19.1124 16.6374 17.5499L13.6249 15.2082C12.7874 15.7707 11.7124 16.1041 9.99993 16.1041C7.3166 16.1041 5.0541 14.5916 4.18743 12.6499L1.0166 15.1166C2.6666 17.6499 6.09993 19.9999 9.99993 19.9999Z" fill="#EA4335" />
-          </svg>
-          <span className="text-sm font-medium text-[#005F5A]">
-            Sign in with Google
-          </span>
-        </button>
+            {/* Google SSO Button */}
+            <button
+              type="button"
+              onClick={() => router.push(config.dashboardRoute)}
+              className="w-full h-[48px] rounded-xl border border-[#D1D5DC] bg-white hover:bg-gray-50 flex items-center justify-center gap-2.5 transition-colors cursor-pointer shadow-2xs"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.99993 3.95833C11.4749 3.95833 12.6499 4.47083 13.4541 4.9L16.0291 2.325C14.5333 0.8875 12.4208 0 9.99993 0C6.09993 0 2.6666 2.35 1.0166 5.77917L4.18743 8.24583C5.0541 5.47083 7.3166 3.95833 9.99993 3.95833Z" fill="#4285F4" />
+                <path d="M19.2083 10.2084C19.2083 9.52508 19.1458 8.86675 19.025 8.22925H10V11.9792H15.1833C14.9583 13.1334 14.275 14.1126 13.2458 14.7709L16.2583 17.1126C18.325 15.4709 19.2083 13.0542 19.2083 10.2084Z" fill="#34A853" />
+                <path d="M4.1875 11.9958C3.71667 10.5917 3.71667 8.99168 4.1875 7.58752L1.01667 5.12085C0.358333 7.02918 0 8.57085 0 10.2083C0 11.8458 0.358333 13.3875 1.01667 14.8792L4.1875 12.4125V11.9958Z" fill="#FBBC05" />
+                <path d="M9.99993 19.9999C12.6999 19.9999 14.9708 19.1124 16.6374 17.5499L13.6249 15.2082C12.7874 15.7707 11.7124 16.1041 9.99993 16.1041C7.3166 16.1041 5.0541 14.5916 4.18743 12.6499L1.0166 15.1166C2.6666 17.6499 6.09993 19.9999 9.99993 19.9999Z" fill="#EA4335" />
+              </svg>
+              <span className="text-sm font-medium text-[#005F5A]">
+                Sign in with Google
+              </span>
+            </button>
+          </>
+        )}
 
         {/* Bottom Toggle Link to Signup */}
         <div className="text-center pt-4">

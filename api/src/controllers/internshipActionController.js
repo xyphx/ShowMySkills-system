@@ -14,7 +14,9 @@ export const updateInternshipAction = async (req, res, next) => {
       });
     }
 
-    if (!['accepted', 'rejected', 'saved', 'unsaved'].includes(action)) {
+    const normalizedAction = action === 'skipped' ? 'rejected' : action;
+
+    if (!['accepted', 'rejected', 'saved', 'unsaved'].includes(normalizedAction)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid action',
@@ -33,9 +35,9 @@ export const updateInternshipAction = async (req, res, next) => {
       });
     }
 
-    const update = action === 'accepted' || action === 'rejected'
-      ? { decision: action }
-      : { saved: action === 'saved' };
+    const update = normalizedAction === 'accepted' || normalizedAction === 'rejected'
+      ? { decision: normalizedAction }
+      : { saved: normalizedAction === 'saved' };
 
     const result = await InternshipAction.findOneAndUpdate(
       { user: req.user.id, internship: id },

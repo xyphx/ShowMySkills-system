@@ -10,7 +10,6 @@ import {
   Send,
   Search,
   SlidersHorizontal,
-  Sparkles,
   Star,
   CheckCheck,
   ChevronLeft,
@@ -22,128 +21,34 @@ import {
   ExternalLink,
 } from "lucide-react";
 import StudentRoleTag, { STUDENT_ROLE_TAGS } from "@/components/StudentRoleTag";
-
-// Initial mock conversations with campus student talent
-const defaultConversations = [
-  {
-    id: 1,
-    name: "Joel A. Jacob",
-    tag: "Maintainer",
-    role: "Frontend Developer",
-    college: "College of Engineering Trivandrum",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/5a82e47de052e6b1e8a0daf000f4c7f2631701fe?width=180",
-    score: 23,
-    online: true,
-    lastTime: "Just now",
-    unread: 1,
-    messages: [
-      {
-        id: "m1",
-        sender: "them",
-        text: "Hey there! Saw you starred my CampusHub project. Thanks a lot!",
-        time: "10:14 AM",
-        status: "read",
-      },
-      {
-        id: "m2",
-        sender: "me",
-        text: "Hi Joel! Loved the Flutter UI architecture. Are you open to collaborating on upcoming hackathons?",
-        time: "10:16 AM",
-        status: "read",
-      },
-      {
-        id: "m3",
-        sender: "them",
-        text: "Definitely! I'm currently refining our ShowMySkills web client components too. Let's build something together!",
-        time: "10:18 AM",
-        status: "delivered",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "S SIDHARTH",
-    tag: "Admin",
-    role: "UI/UX Designer",
-    college: "College of Engineering Trivandrum",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/ab8e554398afb86403d2a7da0c420fe67c60f085?width=180",
-    score: 63,
-    online: true,
-    lastTime: "12m ago",
-    unread: 0,
-    messages: [
-      {
-        id: "m21",
-        sender: "them",
-        text: "Hello! Just updated the FinFlow design system components on Figma. Would love your feedback on the typography tokens.",
-        time: "Yesterday",
-        status: "read",
-      },
-      {
-        id: "m22",
-        sender: "me",
-        text: "The new dark mode contrast ratios look super crisp! Really solid design system work.",
-        time: "Yesterday",
-        status: "read",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Reshma Udhayan",
-    tag: "Promoter",
-    role: "FullStack Developer",
-    college: "College of Engineering Trivandrum",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/c3059191c12486377929540d913e78b03ba9bddc?width=180",
-    score: 72,
-    online: false,
-    lastTime: "2h ago",
-    unread: 0,
-    messages: [
-      {
-        id: "m31",
-        sender: "them",
-        text: "Hi! We're testing the real-time CAD sync websocket pipelines right now.",
-        time: "2h ago",
-        status: "read",
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: "Vaishnav RL",
-    tag: "Ambassador",
-    role: "Graphic Designer",
-    college: "College of Engineering Trivandrum",
-    avatar: "https://api.builder.io/api/v1/image/assets/TEMP/46fce00ed55aca498d8347d953abdc65e3ba2655?width=180",
-    score: 81,
-    online: false,
-    lastTime: "1d ago",
-    unread: 0,
-    messages: [
-      {
-        id: "m41",
-        sender: "them",
-        text: "Hey! Shared the brand vector kit with the design team.",
-        time: "1d ago",
-        status: "read",
-      },
-    ],
-  },
-];
+import { chatService } from "@/services/apiClient";
 
 function ChatsContent() {
   const searchParams = useSearchParams();
   const paramUserId = searchParams.get("user");
   const paramUserName = searchParams.get("name");
 
-  const [conversations, setConversations] = useState(defaultConversations);
-  const [activeChatId, setActiveChatId] = useState(1);
+  const [conversations, setConversations] = useState([]);
+  const [activeChatId, setActiveChatId] = useState(null);
   const [inputText, setInputText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isTypingReply, setIsTypingReply] = useState(false);
   const [mobileViewChat, setMobileViewChat] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Fetch conversations from API directly
+  useEffect(() => {
+    let isMounted = true;
+    chatService.getConversations().then((res) => {
+      if (isMounted && res && Array.isArray(res) && res.length > 0) {
+        setConversations(res);
+        setActiveChatId(res[0]._id || res[0].id);
+      }
+    }).catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Auto-select or create candidate thread if URL contains user & name params
   useEffect(() => {
@@ -158,22 +63,14 @@ function ChatsContent() {
         const newThread = {
           id: numId,
           name: decodeURIComponent(paramUserName),
-          role: "Student Creator",
-          college: "College of Engineering Trivandrum",
-          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-          score: 50,
-          online: true,
+          role: "Candidate",
+          college: "",
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(decodeURIComponent(paramUserName))}&background=4B9C93&color=fff&size=100`,
+          score: 0,
+          online: false,
           lastTime: "Just now",
           unread: 0,
-          messages: [
-            {
-              id: "intro-msg",
-              sender: "them",
-              text: `Hi! Thanks for reaching out. Excited to chat and collaborate on ShowMySkills!`,
-              time: "Just now",
-              status: "delivered",
-            },
-          ],
+          messages: [],
         };
         setConversations((prev) => [newThread, ...prev]);
         setActiveChatId(numId);
@@ -215,41 +112,10 @@ function ChatsContent() {
       })
     );
 
+    // Call chatService in background; fails gracefully if backend is offline
+    chatService.sendMessage(text, activeChat.id, activeChat.conversationId || activeChat.id);
+
     setInputText("");
-
-    // Simulate realistic responsive reply from peer student after 1.2s
-    setIsTypingReply(true);
-    setTimeout(() => {
-      setIsTypingReply(false);
-      const replies = [
-        "That sounds awesome! Let's stay in touch.",
-        "Got it! Thanks for reaching out, happy to share more details about my work.",
-        "Awesome! I'm reviewing our repo today, let's definitely collaborate.",
-        "Great idea! Let me know when you'd like to sync up.",
-      ];
-      const randomReply = replies[Math.floor(Math.random() * replies.length)];
-
-      const replyMsg = {
-        id: `reply-${Date.now()}`,
-        sender: "them",
-        text: randomReply,
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        status: "delivered",
-      };
-
-      setConversations((prev) =>
-        prev.map((c) => {
-          if (c.id === activeChat.id) {
-            return {
-              ...c,
-              lastTime: "Just now",
-              messages: [...c.messages, replyMsg],
-            };
-          }
-          return c;
-        })
-      );
-    }, 1300);
   };
 
   const filteredConversations = conversations.filter((c) =>
@@ -498,9 +364,8 @@ function ChatsContent() {
 
             {/* Quick Prompts */}
             <div className="px-4 py-2 bg-white/70 border-t border-gray-100 flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#4B9C93]" />
-                <span>Suggestions:</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
+                Suggestions:
               </span>
               {quickPrompts.map((prompt) => (
                 <button

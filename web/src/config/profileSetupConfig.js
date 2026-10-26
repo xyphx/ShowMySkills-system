@@ -81,7 +81,7 @@ export const profileSetupConfig = {
         repeatable: true,
         addLabel: "Add internship",
         fields: [
-          { name: "companyName", label: "Company Name", placeholder: "e.g. Acme Company" },
+          { name: "companyName", label: "Company Name", placeholder: "e.g. Tech Corp" },
           { name: "role", label: "Role", placeholder: "e.g. Frontend Developer Intern" },
           { name: "description", label: "Description", type: "textarea", placeholder: "Describe your internship", fullWidth: true },
           { name: "skillsUsed", label: "Skills Used", type: "tags", placeholder: "Type a skill and press Enter", fullWidth: true },
@@ -181,9 +181,9 @@ export const profileSetupConfig = {
         id: "about",
         title: "About",
         fields: [
-          { name: "collegeName", label: "College Name", placeholder: "e.g. Chaitanya Bharathi Institute of Technology", fullWidth: true },
+          { name: "collegeName", label: "College Name", placeholder: "e.g. National Institute of Technology", fullWidth: true },
           { name: "aboutCollege", label: "About College", type: "textarea", placeholder: "Describe about college", fullWidth: true },
-          { name: "email", label: "Email Address", type: "email", placeholder: "cbit@gmail.com" },
+          { name: "email", label: "Email Address", type: "email", placeholder: "contact@university.edu" },
           { name: "phone", label: "Phone Number", type: "tel", placeholder: "+1 (555) 000-0000" },
           { name: "establishedYear", label: "Established Year", type: "number", placeholder: "e.g. 2004" },
           {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, Github, BookOpen, ShieldCheck, Heart } from "lucide-react";
+import { Terminal, Github, BookOpen, ShieldCheck, Heart } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="space-y-4 md:col-span-1">
           <div className="flex items-center space-x-2.5">
             <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-              <Sparkles className="w-4 h-4" />
+              <Terminal className="w-4 h-4" />
             </div>
             <span className="font-extrabold text-lg text-white">
               ShowMy<span className="text-indigo-400">Skills</span>
@@ -42,20 +42,20 @@ export default function Footer() {
         <div>
           <h4 className="text-sm font-semibold text-slate-200 mb-3 uppercase tracking-wider">Platform</h4>
           <ul className="space-y-2 text-xs">
-            <li><Link href="#explore" className="hover:text-white transition-colors">Skill Directory</Link></li>
-            <li><Link href="#how-it-works" className="hover:text-white transition-colors">Skill Benchmarks</Link></li>
-            <li><Link href="#showcase" className="hover:text-white transition-colors">Developer Profile Cards</Link></li>
+            <li><Link href="/people" className="hover:text-white transition-colors">People & Star Talent</Link></li>
             <li><Link href="/internships" className="hover:text-white transition-colors">Internship Opportunities</Link></li>
+            <li><Link href="/launchpad" className="hover:text-white transition-colors">Tech Launchpad</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="text-sm font-semibold text-slate-200 mb-3 uppercase tracking-wider">Resources</h4>
           <ul className="space-y-2 text-xs">
+            <li><Link href="/error" className="hover:text-white transition-colors flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>System Status & Health</span></Link></li>
             <li><a href="https://showmyskills.xyphx.com/api/docs" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Swagger API Specs</a></li>
-            <li><Link href="https://github.com/xyphx/ShowMySkills-system" className="hover:text-white transition-colors">Monorepo GitHub</Link></li>
+            <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+            <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
             <li><Link href="/login" className="hover:text-white transition-colors">Sign In & Authentication</Link></li>
-            <li><span className="text-slate-500">CI/CD AWS EC2 Automated</span></li>
           </ul>
         </div>
 
@@ -72,8 +72,10 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-        <div>
-          © {new Date().getFullYear()} ShowMySkills System. Open-source under MIT License.
+        <div className="flex items-center gap-4">
+          <span>© {new Date().getFullYear()} ShowMySkills System. Open-source under MIT License.</span>
+          <Link href="/terms" className="hover:underline text-slate-400">Terms</Link>
+          <Link href="/privacy" className="hover:underline text-slate-400">Privacy</Link>
         </div>
         <div className="flex items-center gap-1">
           <span>Crafted with</span>

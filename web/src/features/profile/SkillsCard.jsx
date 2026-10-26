@@ -22,21 +22,25 @@ export default function SkillsCard({ skills }) {
     >
       <h3 className="text-lg font-bold text-gray-900 mb-4">Skills</h3>
       <div className="flex flex-wrap gap-2.5">
-        {skills.map((skill) => (
-          <span
-            key={skill.name}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200"
-          >
-            {skill.name}
+        {skills && skills.length > 0 ? (
+          skills.map((skill) => (
             <span
-              className="w-2 h-2 rounded-full shrink-0"
-              style={{
-                backgroundColor: dotColors[skill.level] || "#94a3b8",
-              }}
-              title={skill.level}
-            />
-          </span>
-        ))}
+              key={skill.name}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200"
+            >
+              {skill.name}
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{
+                  backgroundColor: dotColors[skill.level] || "#94a3b8",
+                }}
+                title={skill.level}
+              />
+            </span>
+          ))
+        ) : (
+          <p className="text-sm text-gray-400">No skills added yet.</p>
+        )}
       </div>
     </section>
   );

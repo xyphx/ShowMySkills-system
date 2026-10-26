@@ -41,27 +41,31 @@ export default function ReputationCard({ data }) {
 
       {/* ──── Metric Bars ──── */}
       <div className="space-y-4">
-        {data.metrics.map((metric) => (
-          <div key={metric.label}>
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-sm font-semibold text-gray-700">
-                {metric.label}
-              </span>
-              <span className="text-sm font-bold text-gray-500 tabular-nums">
-                {metric.value}%
-              </span>
+        {data?.metrics && data.metrics.length > 0 ? (
+          data.metrics.map((metric) => (
+            <div key={metric.label}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-sm font-semibold text-gray-700">
+                  {metric.label}
+                </span>
+                <span className="text-sm font-bold text-gray-500 tabular-nums">
+                  {metric.value}%
+                </span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700 ease-out"
+                  style={{
+                    width: `${metric.value}%`,
+                    backgroundColor: metric.color || "#4B9C93",
+                  }}
+                />
+              </div>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-700 ease-out"
-                style={{
-                  width: `${metric.value}%`,
-                  backgroundColor: metric.color || "#4B9C93",
-                }}
-              />
-            </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-sm text-gray-400">No score metrics calculated yet.</p>
+        )}
       </div>
 
       {/* ──── View Details Link ──── */}
