@@ -82,15 +82,26 @@ function LoginFormContent() {
       // still useful to developers while diagnosing a failed request.
       console.error("Login request failed:", err);
 
-      if (err?.status === 401) {
-        setError("The email or password is incorrect. Please check and try again.");
-      } else if (
-        err?.name === "AbortError" ||
-        err?.name === "TimeoutError" ||
-        /aborted|timed out/i.test(err?.message || "")
+      const status = err?.status || err?.data?.statusCode;
+      const rawMsg = String(err?.message || err?.data?.message || "").toLowerCase();
+
+      if (
+        status === 401 ||
+        status === 400 ||
+        rawMsg.includes("invalid") ||
+        rawMsg.includes("incorrect") ||
+        rawMsg.includes("password") ||
+        rawMsg.includes("credential")
       ) {
-        setError("Sign-in is taking longer than expected. Please try again.");
+        setError("Email or password is incorrect.");
+      } else if (
+        status === 429 ||
+        rawMsg.includes("too many") ||
+        rawMsg.includes("rate limit")
+      ) {
+        setError("Too many login attempts. Please try again in a moment.");
       } else {
+        // Friendly message for server, connection, database, or socket problems
         setError("We couldn’t sign you in right now. Please try again in a moment.");
       }
       setLoading(false);
