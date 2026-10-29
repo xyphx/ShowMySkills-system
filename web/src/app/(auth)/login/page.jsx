@@ -78,7 +78,21 @@ function LoginFormContent() {
       setLoading(false);
       router.push(config.dashboardRoute);
     } catch (err) {
-      setError(err.message || "Failed to log in. Please check your credentials.");
+      // Keep browser/network details out of the user-facing form. They are
+      // still useful to developers while diagnosing a failed request.
+      console.error("Login request failed:", err);
+
+      if (err?.status === 401) {
+        setError("The email or password is incorrect. Please check and try again.");
+      } else if (
+        err?.name === "AbortError" ||
+        err?.name === "TimeoutError" ||
+        /aborted|timed out/i.test(err?.message || "")
+      ) {
+        setError("Sign-in is taking longer than expected. Please try again.");
+      } else {
+        setError("We couldn’t sign you in right now. Please try again in a moment.");
+      }
       setLoading(false);
     }
   };
