@@ -24,6 +24,7 @@ import {
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import InternshipCard from "@/features/internships/InternshipCard";
+import { tokenStorage } from "@/services/apiClient";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -86,7 +87,7 @@ function mapInternship(item) {
 
 // Persist an internship action through the authenticated backend API.
 async function saveInternshipAction(internshipId, action) {
-  const token = sessionStorage.getItem("token");
+  const token = tokenStorage.getAccessToken();
 
   if (!token) {
     throw new Error("Please log in before saving internship actions.");
@@ -116,7 +117,7 @@ async function saveInternshipAction(internshipId, action) {
 // Read this user's previous actions so acted-on cards stay out of the deck
 // after a refresh. If no token is available, the public feed still loads.
 async function getActionedInternshipIds() {
-  const token = sessionStorage.getItem("token");
+  const token = tokenStorage.getAccessToken();
   if (!token) return new Set();
 
   try {
@@ -176,7 +177,7 @@ export default function InternshipsPage() {
 
   // Fetch user's saved and accepted actions
   const fetchMyActions = useCallback(async () => {
-    const token = sessionStorage.getItem("token");
+    const token = tokenStorage.getAccessToken();
     if (!token) {
       setMyActions([]);
       return;
