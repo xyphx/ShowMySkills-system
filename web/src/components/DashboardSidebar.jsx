@@ -58,6 +58,7 @@ export default function DashboardSidebar() {
   } else if (role === "company") {
     topNavItems = [
       { label: "Dashboard", href: "/company/dashboard", icon: LayoutDashboard },
+      { label: "Manage Internships", href: "/company/internships", icon: Briefcase },
       { label: "Applications", href: "/company/applications", icon: FileText },
       { label: "People", href: "/company/people", icon: Users },
       { label: "Chats", href: "/company/chats", icon: MessageSquare },
@@ -140,7 +141,7 @@ export default function DashboardSidebar() {
     <>
       {/* ──── Mobile Backdrop Blur Overlay ──── */}
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-2xs z-40 transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 bg-black/50 backdrop-blur-xs z-[99] transition-opacity duration-300 md:hidden ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSidebar}
@@ -150,7 +151,7 @@ export default function DashboardSidebar() {
       {/* ──── Main Animated Sidebar ──── */}
       <aside
         id="dashboard-sidebar"
-        className={`fixed left-0 top-0 bottom-0 w-[240px] sm:w-[250px] md:w-[220px] bg-[#4B9C93] flex flex-col justify-between z-50 overflow-hidden py-4 px-3 shadow-2xl md:shadow-none transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed left-0 top-0 bottom-0 w-[280px] sm:w-[280px] md:w-[220px] bg-[#4B9C93] flex flex-col justify-between z-[100] overflow-hidden py-4 px-3 shadow-2xl md:shadow-none transition-transform duration-300 ease-in-out md:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{ borderTopRightRadius: "24px", borderBottomRightRadius: "24px" }}
@@ -228,27 +229,7 @@ export default function DashboardSidebar() {
                 Sign Up / Log In
               </Link>
             </div>
-          ) : role === "company" ? (
-            <div className="my-2 bg-white rounded-xl p-3 shadow-md shadow-black/5 text-center">
-              <div className="h-6 w-6 rounded-full bg-[#4B9C93]/10 flex items-center justify-center mx-auto mb-1">
-                <Briefcase className="w-3.5 h-3.5 text-[#4B9C93]" />
-              </div>
-              <h4 className="text-xs font-bold text-gray-900 mb-0.5">
-                Hire Top Students
-              </h4>
-              <p className="text-[10px] text-gray-500 leading-tight mb-2">
-                Post verified internship opportunities and review applications
-              </p>
-              <Link
-                href="/company/applications?new=true"
-                onClick={closeSidebar}
-                id="sidebar-company-post-btn"
-                className="block w-full py-1.5 rounded-full bg-[#4B9C93] text-white text-[11px] font-semibold hover:bg-[#3d867e] transition-colors cursor-pointer text-center"
-              >
-                Post Internship
-              </Link>
-            </div>
-          ) : role === "college" ? (
+          ) : role === "company" ? null : role === "college" ? (
             <div className="my-2 bg-white rounded-xl p-3 shadow-md shadow-black/5 text-center">
               <div className="h-6 w-6 rounded-full bg-[#4B9C93]/10 flex items-center justify-center mx-auto mb-1">
                 <GraduationCap className="w-3.5 h-3.5 text-[#4B9C93]" />

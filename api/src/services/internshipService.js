@@ -1,4 +1,7 @@
+import mongoose from 'mongoose';
 import Internship from '../models/Internship.js';
+import Application from '../models/Application.js';
+import InternshipAction from '../models/InternshipAction.js';
 
 export const getInternships = async (query) => {
   const page = Math.max(1, Number(query.page) || 1);
@@ -26,9 +29,27 @@ export const getInternships = async (query) => {
     filter.company = new RegExp(String(query.company).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
   }
 
+  if (query.postedBy) {
+    filter.postedBy = query.postedBy;
+  }
+
   if (query.location) {
     filter.location = {
       $regex: String(query.location).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      $options: 'i',
+    };
+  }
+
+  if (query.department) {
+    filter.department = {
+      $regex: String(query.department).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      $options: 'i',
+    };
+  }
+
+  if (query.track) {
+    filter.track = {
+      $regex: String(query.track).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
       $options: 'i',
     };
   }
@@ -56,6 +77,8 @@ export const getInternships = async (query) => {
         { company: { $regex: escaped, $options: 'i' } },
         { skills: { $regex: escaped, $options: 'i' } },
         { description: { $regex: escaped, $options: 'i' } },
+        { department: { $regex: escaped, $options: 'i' } },
+        { track: { $regex: escaped, $options: 'i' } },
       ];
     }
   }
@@ -98,16 +121,32 @@ export const getInternshipById = async (id) => {
 };
 
 export const createInternship = async (data, userId = null) => {
+  const payload = { ...data };
+  if (typeof payload.department === 'string') {
+    payload.department = payload.department.trim();
+  }
+  if (typeof payload.track === 'string') {
+    payload.track = payload.track.trim();
+  }
+
   const newInternship = await Internship.create({
-    ...data,
+    ...payload,
     postedBy: userId,
-    status: data.status || 'active',
+    status: payload.status || 'active',
   });
   return newInternship;
 };
 
 export const updateInternship = async (id, data) => {
-  const updated = await Internship.findByIdAndUpdate(id, { $set: data }, { new: true });
+  const updatePayload = { ...data };
+  if (typeof updatePayload.department === 'string') {
+    updatePayload.department = updatePayload.department.trim();
+  }
+  if (typeof updatePayload.track === 'string') {
+    updatePayload.track = updatePayload.track.trim();
+  }
+
+  const updated = await Internship.findByIdAndUpdate(id, { $set: updatePayload }, { new: true });
   if (!updated) {
     const error = new Error('Internship not found');
     error.statusCode = 404;
@@ -122,6 +161,14 @@ export const deleteInternship = async (id) => {
     const error = new Error('Internship not found');
     error.statusCode = 404;
     throw error;
+  }
+  // Permanently remove associated candidate application and action records
+  if (mongoose.connection && mongoose.connection.readyState === 1) {
+    await Application.deleteMany({ internship: id });
+    await InternshipAction.deleteMany({ internship: id });
+  } else if (typeof Application.deleteMany === 'function' && Application.deleteMany !== mongoose.Model?.deleteMany) {
+    await Application.deleteMany({ internship: id });
+    await InternshipAction.deleteMany?.({ internship: id });
   }
   return deleted;
 };

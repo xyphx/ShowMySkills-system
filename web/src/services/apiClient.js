@@ -469,6 +469,14 @@ export const internshipService = {
     return apiRequest("/internships", "POST", internshipData);
   },
 
+  update: async (id, internshipData) => {
+    return apiRequest(`/internships/${id}`, "PUT", internshipData);
+  },
+
+  delete: async (id) => {
+    return apiRequest(`/internships/${id}`, "DELETE");
+  },
+
   apply: async (internshipId, notes = "") => {
     return apiRequest("/applications/apply", "POST", { internshipId, notes });
   },
@@ -605,3 +613,18 @@ export const supportService = {
     return apiRequest("/support/tickets", "POST", ticketData);
   },
 };
+
+export const uploadService = {
+  uploadInternshipPoster: async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiRequest("/upload/internship-poster", "POST", formData);
+  },
+
+  uploadCompanyLogo: async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiRequest("/upload/logo", "POST", formData);
+  },
+};
+
