@@ -122,8 +122,8 @@ test('Major Contributors: Layout matches neat square/rectangular photo, name bel
   const AVAILABLE_PHOTOS = [
     '/contributors/s-sidharth.png',
     '/contributors/joel-a-jacob.png',
-    '/contributors/palla-bindhu.jpg',
-    '/contributors/priyanshi-bhati.jpeg',
+    '/contributors/palla-bindhu.jpg.png',
+    '/contributors/priyanshi-bhati.png',
   ];
 
   for (const photoPath of AVAILABLE_PHOTOS) {

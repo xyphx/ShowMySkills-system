@@ -51,12 +51,12 @@ const MAJOR_CONTRIBUTORS = [
   {
     id: "palla-bindhu",
     name: "Palla Bindhu",
-    image: "/contributors/palla-bindhu.jpg",
+    image: "/contributors/palla-bindhu.jpg.png",
   },
   {
     id: "priyanshi-bhati",
     name: "Priyanshi Bhati",
-    image: "/contributors/priyanshi-bhati.jpeg",
+    image: "/contributors/priyanshi-bhati.png",
   },
   {
     id: "priyanshu",
@@ -108,7 +108,7 @@ function ContributorAvatar({ name, image }) {
         alt={name}
         onLoad={() => setLoaded(true)}
         onError={() => setHasError(true)}
-        className={`w-full h-full object-cover object-top filter grayscale-[65%] sepia-[15%] hue-rotate-[130deg] contrast-[1.05] transition-all duration-300 group-hover:grayscale-0 group-hover:sepia-0 group-hover:scale-105 ${
+        className={`w-full h-full object-cover object-top filter grayscale-[65%] sepia-[15%] hue-rotate-[130deg] contrast-[1.05] transition-all duration-300 group-hover:grayscale-0 group-hover:sepia-0 group-hover:hue-rotate-0 group-hover:contrast-100 group-hover:scale-105 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
         loading="lazy"

@@ -11,7 +11,7 @@ Recommended format: Square JPG or PNG, at least 300x300 pixels.
 | Joel A Jacob | `joel-a-jacob.png` | Active |
 | Akash Nadar | `akash-nadar.jpg` (or `.png`) | Awaiting photo (shows avatar fallback) |
 | Krithi Kushwaha | `krithi-kushwaha.jpg` (or `.png`) | Awaiting photo (shows avatar fallback) |
-| Palla Bindhu | `palla-bindhu.jpg` | Active |
-| Priyanshi Bhati | `priyanshi-bhati.jpeg` | Active |
+| Palla Bindhu | `palla-bindhu.jpg.png` | Active |
+| Priyanshi Bhati | `priyanshi-bhati.png` | Active |
 | Priyanshu | `priyanshu.jpg` (or `.png`) | Awaiting photo (shows avatar fallback) |
 | VishnuSree | `vishnusree.jpg` (or `.png`) | Awaiting photo (shows avatar fallback) |
