@@ -108,11 +108,14 @@ function ContributorAvatar({ name, image }) {
         alt={name}
         onLoad={() => setLoaded(true)}
         onError={() => setHasError(true)}
-        className={`w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105 ${
+        className={`w-full h-full object-cover object-top filter grayscale-[65%] sepia-[15%] hue-rotate-[130deg] contrast-[1.05] transition-all duration-300 group-hover:grayscale-0 group-hover:sepia-0 group-hover:scale-105 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
         loading="lazy"
       />
+      {loaded && (
+        <div className="absolute inset-0 bg-[#4B9C93]/[0.08] mix-blend-color pointer-events-none transition-opacity duration-300 group-hover:opacity-0" />
+      )}
     </div>
   );
 }

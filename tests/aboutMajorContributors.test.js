@@ -151,6 +151,28 @@ test('Major Contributors: Responsive layout classes are configured for mobile an
   assert.ok(pageSource.includes('#4B9C93'), 'Section must use ShowMySkills teal branding');
 });
 
+test('Major Contributors: Subtle black-and-white treatment with teal tint is applied reversibly in CSS', () => {
+  const pageSource = fs.readFileSync(aboutPagePath, 'utf8');
+
+  // Verify light desaturation and contrast boost
+  assert.ok(
+    pageSource.includes('grayscale-') && pageSource.includes('contrast-'),
+    'Photo must use a subtle black-and-white treatment with contrast adjustment'
+  );
+
+  // Verify teal/green tint via hue-rotate/sepia and/or overlay
+  assert.ok(
+    pageSource.includes('hue-rotate') || pageSource.includes('mix-blend'),
+    'Photo must include a restrained teal/green tint'
+  );
+
+  // Verify transition to original vibrancy on hover
+  assert.ok(
+    pageSource.includes('group-hover:grayscale-0'),
+    'Photo should smoothly restore natural color vibrancy on hover'
+  );
+});
+
 test('Major Contributors: web/public/contributors/README.md lists all eight suggested filenames', () => {
   assert.ok(fs.existsSync(readmePath), 'web/public/contributors/README.md must exist');
   const readmeContent = fs.readFileSync(readmePath, 'utf8');
