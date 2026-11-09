@@ -151,25 +151,30 @@ test('Major Contributors: Responsive layout classes are configured for mobile an
   assert.ok(pageSource.includes('#4B9C93'), 'Section must use ShowMySkills teal branding');
 });
 
-test('Major Contributors: Subtle black-and-white treatment with teal tint is applied reversibly in CSS', () => {
+test('Major Contributors: Black-and-white photo treatment at rest smoothly restores natural color on hover and touch', () => {
   const pageSource = fs.readFileSync(aboutPagePath, 'utf8');
 
-  // Verify light desaturation and contrast boost
+  // Verify clean black-and-white treatment at rest
   assert.ok(
-    pageSource.includes('grayscale-') && pageSource.includes('contrast-'),
-    'Photo must use a subtle black-and-white treatment with contrast adjustment'
+    pageSource.includes('grayscale') && pageSource.includes('contrast-'),
+    'Photo must use a black-and-white treatment with contrast adjustment'
   );
 
-  // Verify teal/green tint via hue-rotate/sepia and/or overlay
-  assert.ok(
+  // Verify no green/teal tint via hue-rotate/sepia/mix-blend
+  assert.strictEqual(
     pageSource.includes('hue-rotate') || pageSource.includes('mix-blend'),
-    'Photo must include a restrained teal/green tint'
+    false,
+    'Photo must not include green/teal tint'
   );
 
-  // Verify transition to original vibrancy on hover
+  // Verify transition to original color vibrancy on hover and touch/focus
   assert.ok(
     pageSource.includes('group-hover:grayscale-0'),
     'Photo should smoothly restore natural color vibrancy on hover'
+  );
+  assert.ok(
+    pageSource.includes('group-focus-within:grayscale-0') || pageSource.includes('active:grayscale-0'),
+    'Photo should restore natural color on touch/focus for accessibility'
   );
 });
 

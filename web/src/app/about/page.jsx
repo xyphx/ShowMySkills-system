@@ -80,11 +80,9 @@ function shuffleContributors(list) {
 }
 
 function ContributorAvatar({ name, image }) {
-  const [loaded, setLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    setLoaded(false);
     setHasError(false);
   }, [image]);
 
@@ -97,26 +95,12 @@ function ContributorAvatar({ name, image }) {
   }
 
   return (
-    <div className="relative w-full h-full bg-[#E6F7F3]">
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center text-[#4B9C93]">
-          <User className="w-14 h-14 sm:w-16 sm:h-16 text-[#4B9C93]/60" strokeWidth={1.5} />
-        </div>
-      )}
-      <img
-        src={image}
-        alt={name}
-        onLoad={() => setLoaded(true)}
-        onError={() => setHasError(true)}
-        className={`w-full h-full object-cover object-top filter grayscale-[65%] sepia-[15%] hue-rotate-[130deg] contrast-[1.05] transition-all duration-300 group-hover:grayscale-0 group-hover:sepia-0 group-hover:hue-rotate-0 group-hover:contrast-100 group-hover:scale-105 ${
-          loaded ? "opacity-100" : "opacity-0"
-        }`}
-        loading="lazy"
-      />
-      {loaded && (
-        <div className="absolute inset-0 bg-[#4B9C93]/[0.08] mix-blend-color pointer-events-none transition-opacity duration-300 group-hover:opacity-0" />
-      )}
-    </div>
+    <img
+      src={image}
+      alt={name}
+      onError={() => setHasError(true)}
+      className="w-full h-full object-cover object-top filter grayscale contrast-[1.02] transition-all duration-300 group-hover:grayscale-0 group-focus-within:grayscale-0 group-active:grayscale-0 active:grayscale-0 group-hover:contrast-100 group-hover:scale-105 group-focus-within:scale-105 motion-reduce:transition-none motion-reduce:transform-none"
+    />
   );
 }
 
@@ -757,7 +741,8 @@ export default function AboutPage() {
             {contributors.map((contributor) => (
               <div
                 key={contributor.id}
-                className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#4B9C93]/40 transition-all flex flex-col items-center text-center group"
+                tabIndex={0}
+                className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#4B9C93]/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4B9C93] transition-all flex flex-col items-center text-center group cursor-pointer sm:cursor-default"
               >
                 {/* Square/Rectangular Photo Area */}
                 <div className="w-full aspect-square rounded-xl overflow-hidden mb-3.5 bg-[#E6F7F3] border border-[#4B9C93]/20 flex items-center justify-center relative shadow-inner">
