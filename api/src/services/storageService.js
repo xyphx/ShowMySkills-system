@@ -5,11 +5,27 @@
  */
 
 export class StorageService {
-  constructor() {
-    this.baseUrl = (process.env.STORAGE_BASE_URL || 'https://storage.xyphx.com').replace(/\/+$/, '');
-    this.productId = process.env.STORAGE_PRODUCT_ID || 'showmyskills';
-    this.productKey = process.env.STORAGE_PRODUCT_KEY || '';
-    this.productSecret = process.env.STORAGE_PRODUCT_SECRET || '';
+  constructor(config = {}) {
+    this._baseUrl = config.baseUrl;
+    this._productId = config.productId;
+    this._productKey = config.productKey;
+    this._productSecret = config.productSecret;
+  }
+
+  get baseUrl() {
+    return (this._baseUrl || process.env.STORAGE_BASE_URL || 'https://storage.xyphx.com').replace(/\/+$/, '');
+  }
+
+  get productId() {
+    return this._productId || process.env.STORAGE_PRODUCT_ID || 'showmyskills';
+  }
+
+  get productKey() {
+    return this._productKey || process.env.STORAGE_PRODUCT_KEY || '';
+  }
+
+  get productSecret() {
+    return this._productSecret || process.env.STORAGE_PRODUCT_SECRET || '';
   }
 
   /**
@@ -136,3 +152,4 @@ export class StorageService {
 
 export const storageService = new StorageService();
 export default storageService;
+

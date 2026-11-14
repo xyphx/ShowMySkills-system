@@ -101,3 +101,4 @@ router.get('/quota', mediaController.handleGetQuota);
 router.delete('/:fileId', mediaController.handleMediaDelete);
 
 export default router;
+
