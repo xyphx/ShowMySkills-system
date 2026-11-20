@@ -1,5 +1,37 @@
+import fs from 'node:fs';
 import { formatFileUrl } from '../services/uploadService.js';
+import storageService from '../services/storageService.js';
 import User from '../models/User.js';
+
+/**
+ * Helper to upload a locally-saved multer file to XyphX Centralized Storage
+ * with automatic fallback to local URL if offline or unconfigured.
+ */
+async function processUploadToCentralizedStorage(req, subfolder) {
+  let fileUrl = formatFileUrl(req, req.file, subfolder);
+  let fileId = null;
+
+  if (storageService.isConfigured() && req.file?.path) {
+    try {
+      const buffer = await fs.promises.readFile(req.file.path);
+      const userId = req.user?.id || 'usr_anonymous';
+      const result = await storageService.uploadFile({
+        userId,
+        buffer,
+        fileName: req.file.originalname || req.file.filename,
+        mimeType: req.file.mimetype,
+      });
+      if (result?.url) {
+        fileUrl = result.url;
+        fileId = result.fileId;
+      }
+    } catch (storageErr) {
+      console.warn(`[StorageService] Centralized upload fallback to local for ${subfolder}:`, storageErr.message);
+    }
+  }
+
+  return { fileUrl, fileId };
+}
 
 export const uploadController = {
   // Upload user avatar & optionally attach to profileIcon
@@ -9,11 +41,13 @@ export const uploadController = {
         return res.status(400).json({ success: false, message: 'No avatar image uploaded' });
       }
 
-      const fileUrl = formatFileUrl(req, req.file, 'avatars');
+      const { fileUrl, fileId } = await processUploadToCentralizedStorage(req, 'avatars');
 
       // If user is logged in, auto-update profileIcon
       if (req.user?.id) {
-        await User.findByIdAndUpdate(req.user.id, { $set: { profileIcon: fileUrl } });
+        const updateFields = { profileIcon: fileUrl };
+        if (fileId) updateFields.profileIconFileId = fileId;
+        await User.findByIdAndUpdate(req.user.id, { $set: updateFields });
       }
 
       res.status(201).json({
@@ -21,6 +55,7 @@ export const uploadController = {
         message: 'Avatar uploaded successfully',
         data: {
           url: fileUrl,
+          fileId,
           filename: req.file.filename,
           size: req.file.size,
           mimetype: req.file.mimetype,
@@ -38,10 +73,12 @@ export const uploadController = {
         return res.status(400).json({ success: false, message: 'No resume document uploaded' });
       }
 
-      const fileUrl = formatFileUrl(req, req.file, 'resumes');
+      const { fileUrl, fileId } = await processUploadToCentralizedStorage(req, 'resumes');
 
       if (req.user?.id) {
-        await User.findByIdAndUpdate(req.user.id, { $set: { resumeUrl: fileUrl } });
+        const updateFields = { resumeUrl: fileUrl };
+        if (fileId) updateFields.resumeFileId = fileId;
+        await User.findByIdAndUpdate(req.user.id, { $set: updateFields });
       }
 
       res.status(201).json({
@@ -49,6 +86,7 @@ export const uploadController = {
         message: 'Resume uploaded successfully',
         data: {
           url: fileUrl,
+          fileId,
           filename: req.file.filename,
           size: req.file.size,
         },
@@ -65,13 +103,14 @@ export const uploadController = {
         return res.status(400).json({ success: false, message: 'No certificate document uploaded' });
       }
 
-      const fileUrl = formatFileUrl(req, req.file, 'certificates');
+      const { fileUrl, fileId } = await processUploadToCentralizedStorage(req, 'certificates');
 
       res.status(201).json({
         success: true,
         message: 'Certificate uploaded successfully',
         data: {
           url: fileUrl,
+          fileId,
           filename: req.file.filename,
         },
       });
@@ -87,7 +126,7 @@ export const uploadController = {
         return res.status(400).json({ success: false, message: 'No logo image uploaded' });
       }
 
-      const fileUrl = formatFileUrl(req, req.file, 'company-logos');
+      const { fileUrl, fileId } = await processUploadToCentralizedStorage(req, 'company-logos');
 
       if (req.user?.id) {
         await User.findByIdAndUpdate(req.user.id, {
@@ -100,6 +139,7 @@ export const uploadController = {
         message: 'Company logo uploaded successfully',
         data: {
           url: fileUrl,
+          fileId,
           filename: req.file.filename,
         },
       });
@@ -115,13 +155,14 @@ export const uploadController = {
         return res.status(400).json({ success: false, message: 'No attachment uploaded' });
       }
 
-      const fileUrl = formatFileUrl(req, req.file, 'chat-attachments');
+      const { fileUrl, fileId } = await processUploadToCentralizedStorage(req, 'chat-attachments');
 
       res.status(201).json({
         success: true,
         message: 'Chat attachment uploaded successfully',
         data: {
           url: fileUrl,
+          fileId,
           filename: req.file.filename,
           size: req.file.size,
           mimetype: req.file.mimetype,
@@ -156,3 +197,5 @@ export const uploadController = {
     }
   },
 };
+
+export default uploadController;
